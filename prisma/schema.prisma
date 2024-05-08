@@ -10,5 +10,57 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Product {
+  id String @id @default(uuid())
+  name String
+  priceInCents Int
+  imagePath String
+  description String
+  inventory Int @default(0)
+  available Boolean @default(false)
+  numSold Int @default(0)
+
+  orders Order[]
+}
+
+model Customer {
+  id String @id @default(uuid())
+  firstName String
+  lastName String
+  subscribedToNewsletter Boolean @default(false)
+  email String @unique
+  createdAd DateTime @default(now())
+  numOrders Int
+
+  orders Order[]
+  cart Cart[]
+}
+
+model AdminUser {
+  id String @id @default(uuid())
+}
+
+model Order {
+  id String @id @default(uuid())
+  pricePaidInCents Int[]
+  createdAt DateTime @default(now())
+  shipped Boolean @default(false)
+
+  customerId String
+  productId String[]
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+}
+
+model Cart {
+  id String @id @default(uuid())
+  productId String[]
+  customerId String
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 }
