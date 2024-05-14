@@ -9,58 +9,63 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("POSTGRES_PRISMA_URL")
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model Product {
-  id String @id @default(uuid())
-  name String
+  id           Int     @id @default(autoincrement())
+  name         String
   priceInCents Int
-  imagePath String
-  description String
-  inventory Int @default(0)
-  available Boolean @default(false)
-  numSold Int @default(0)
+  imagePath    String
+  description  String
+  inventory    Int     @default(0)
+  available    Boolean @default(false)
+  numSold      Int     @default(0)
 
   orders Order[]
+  carts  Cart[]
 }
 
 model Customer {
-  id String @id @default(uuid())
-  firstName String
-  lastName String
-  subscribedToNewsletter Boolean @default(false)
-  email String @unique
-  createdAd DateTime @default(now())
-  numOrders Int
+  id                     String   @id @default(uuid())
+  firstName              String
+  lastName               String
+  subscribedToNewsletter Boolean  @default(false)
+  email                  String   @unique
+  dateCreated            DateTime @default(now())
+  numOrders              Int
 
+  cart   Cart?
   orders Order[]
-  cart Cart[]
 }
 
 model AdminUser {
-  id String @id @default(uuid())
+  id        String   @id @default(uuid())
+  userRole  Int
+  active    Boolean  @default(true)
+  lastLogin DateTime
 }
 
 model Order {
-  id String @id @default(uuid())
+  id               Int      @id @default(autoincrement())
   pricePaidInCents Int[]
-  createdAt DateTime @default(now())
-  shipped Boolean @default(false)
+  dateCreated      DateTime @default(now())
+  dateShipped      DateTime
+  trackingNumber   String
+  // Need to add address information
+  status           Int
 
   customerId String
-  productId String[]
-
-  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  products   Product[]
 }
 
 model Cart {
-  id String @id @default(uuid())
-  productId String[]
-  customerId String
+  id         String @id @default(uuid())
+  customerId String @unique
 
-  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customer Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  products Product[]
 }
