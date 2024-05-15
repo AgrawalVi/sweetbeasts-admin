@@ -26,6 +26,7 @@ model Product {
 
   orders Order[]
   carts  Cart[]
+  // reviews Review[]
 }
 
 model Customer {
@@ -34,11 +35,13 @@ model Customer {
   lastName               String
   subscribedToNewsletter Boolean  @default(false)
   email                  String   @unique
+  phone                  String?
   dateCreated            DateTime @default(now())
   numOrders              Int
 
   cart   Cart?
   orders Order[]
+  // reviews Review[]
 }
 
 model AdminUser {
@@ -55,6 +58,7 @@ model Order {
   dateShipped      DateTime
   trackingNumber   String
   // Need to add address information
+  //address String
   status           Int
 
   customerId String
@@ -69,3 +73,15 @@ model Cart {
   customer Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
   products Product[]
 }
+
+// model Review {
+//   id        Int    @id @default(autoincrement())
+//   productId Int
+//   title     String
+//   content   String
+//   rating    Int
+//   authorId  String
+
+//   product Product  @relation(fields: [productId], references: [id])
+//   author  Customer @relation(fields: [authorId], references: [id])
+// }
