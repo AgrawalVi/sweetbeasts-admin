@@ -24,9 +24,9 @@ model Product {
   available    Boolean @default(false)
   numSold      Int     @default(0)
 
-  orders Order[]
-  carts  Cart[]
-  // reviews Review[]
+  orders  Order[]
+  carts   Cart[]
+  reviews Review[]
 }
 
 model Customer {
@@ -35,13 +35,13 @@ model Customer {
   lastName               String
   subscribedToNewsletter Boolean  @default(false)
   email                  String   @unique
-  phone                  String?
+  phone                  String?  @unique
   dateCreated            DateTime @default(now())
   numOrders              Int
 
-  cart   Cart?
-  orders Order[]
-  // reviews Review[]
+  cart    Cart?
+  orders  Order[]
+  reviews Review[]
 }
 
 model AdminUser {
@@ -74,14 +74,14 @@ model Cart {
   products Product[]
 }
 
-// model Review {
-//   id        Int    @id @default(autoincrement())
-//   productId Int
-//   title     String
-//   content   String
-//   rating    Int
-//   authorId  String
+model Review {
+  id        Int    @id @default(autoincrement())
+  productId Int
+  title     String
+  content   String
+  rating    Int
+  authorId  String
 
-//   product Product  @relation(fields: [productId], references: [id])
-//   author  Customer @relation(fields: [authorId], references: [id])
-// }
+  product Product  @relation(fields: [productId], references: [id])
+  author  Customer @relation(fields: [authorId], references: [id])
+}
