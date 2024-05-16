@@ -36,9 +36,9 @@ model Customer {
   lastName               String
   subscribedToNewsletter Boolean  @default(false)
   email                  String   @unique
-  phone                  String?  @unique
+  phone                  String?
   dateCreated            DateTime @default(now())
-  numOrders              Int
+  numOrders              Int @default(0)
 
   cart    Cart?
   orders  Order[]
