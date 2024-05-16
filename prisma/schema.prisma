@@ -38,7 +38,7 @@ model Customer {
   email                  String   @unique
   phone                  String?
   dateCreated            DateTime @default(now())
-  numOrders              Int @default(0)
+  numOrders              Int      @default(0)
 
   cart    Cart?
   orders  Order[]
@@ -93,7 +93,7 @@ enum Currency {
 
 model Price {
   id        Int      @id @default(autoincrement())
-  currency  Currency
+  currency  Currency @default(usd)
   productId Int
   product   Product  @relation(fields: [productId], references: [id])
 }
