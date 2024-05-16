@@ -27,6 +27,7 @@ model Product {
   orders  Order[]
   carts   Cart[]
   reviews Review[]
+  Price   Price[]
 }
 
 model Customer {
@@ -84,4 +85,15 @@ model Review {
 
   product Product  @relation(fields: [productId], references: [id])
   author  Customer @relation(fields: [authorId], references: [id])
+}
+
+enum Currency {
+  usd
+}
+
+model Price {
+  id        Int      @id @default(autoincrement())
+  currency  Currency
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
 }
