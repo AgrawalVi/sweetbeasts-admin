@@ -18,8 +18,35 @@ import { cn } from "@/lib/utils";
 export default function Header() {
   const pathname = usePathname();
 
+  const navItems = [
+    {
+      name: "Dashboard",
+      path: '/dashboard',
+    },
+    {
+      name: "Orders",
+      path: '/dashboard/orders',
+    },
+    {
+      name: "Products",
+      path: '/dashboard/products',
+    },
+    {
+      name: "Customers",
+      path: '/dashboard/customers',
+    },
+    {
+      name: "Analytics",
+      path: '/dashboard/analytics',
+    },
+    {
+      name: "Settings",
+      path: '/dashboard/settings',
+    },
+  ]
+
   return (
-    <header className="sticky top-0 flex h-16 lg:h-20 items-center gap-4 border-b bg-background px-4 md:px-6">
+    <div className="sticky top-0 flex h-16 lg:h-20 items-center gap-4 border-b bg-background px-4 md:px-6">
       <nav
         className={cn("hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6")}>
         <Link
@@ -28,37 +55,14 @@ export default function Header() {
         >
           <Package2 className="h-6 w-6"/>
         </Link>
-        <Link
-          href="/dashboard"
-          className={cn("transition-colors lg:text-lg hover:text-foreground", pathname === "/dashboard" ? "text-foreground" : 'text-muted-foreground')}
-        >
-          Dashboard
-        </Link>
-        <Link
-          href="/dashboard/orders"
-          className={cn("transition-colors lg:text-lg hover:text-foreground", pathname === "/dashboard/orders" ? "text-foreground" : 'text-muted-foreground')}>
-          Orders
-        </Link>
-        <Link
-          href="/dashboard/products"
-          className={cn("transition-colors lg:text-lg hover:text-foreground", pathname === "/dashboard/products" ? "text-foreground" : 'text-muted-foreground')}>
-          Products
-        </Link>
-        <Link
-          href="/dashboard/customers"
-          className={cn("transition-colors lg:text-lg hover:text-foreground", pathname === "/dashboard/customers" ? "text-foreground" : 'text-muted-foreground')}>
-          Customers
-        </Link>
-        <Link
-          href="/dashboard/analytics"
-          className={cn("transition-colors lg:text-lg hover:text-foreground", pathname === "/dashboard/analytics" ? "text-foreground" : 'text-muted-foreground')}>
-          Analytics
-        </Link>
-        <Link
-          href="/dashboard/settings"
-          className={cn("transition-colors lg:text-lg hover:text-foreground", pathname === "/dashboard/settings" ? "text-foreground" : 'text-muted-foreground')}>
-          Settings
-        </Link>
+        {
+          navItems.map((item, i) => (
+            <Link href={item.path} key={i}
+                  className={cn("transition-colors lg:text-lg hover:text-foreground", item.path === pathname ? "text-foreground" : 'text-muted-foreground')}>
+              {item.name}
+            </Link>
+          ))
+        }
       </nav>
       <Sheet>
         <SheetTrigger asChild>
@@ -80,33 +84,14 @@ export default function Header() {
               <Package2 className="h-6 w-6"/>
               <span className="sr-only">Acme Inc</span>
             </Link>
-            <Link href="#" className="hover:text-foreground">
-              Dashboard
-            </Link>
-            <Link
-              href="#"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Orders
-            </Link>
-            <Link
-              href="#"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Products
-            </Link>
-            <Link
-              href="#"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Customers
-            </Link>
-            <Link
-              href="#"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Analytics
-            </Link>
+            {
+              navItems.map((item, i) => (
+                <Link href={item.path} key={i}
+                      className={cn("transition-colors lg:text-lg hover:text-foreground", item.path === pathname ? "text-foreground" : 'text-muted-foreground')}>
+                  {item.name}
+                </Link>
+              ))
+            }
           </nav>
         </SheetContent>
       </Sheet>
@@ -138,6 +123,6 @@ export default function Header() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </header>
+    </div>
   )
 }
