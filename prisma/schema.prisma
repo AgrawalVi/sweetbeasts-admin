@@ -30,13 +30,13 @@ model Product {
 }
 
 model Customer {
-  id                     String   @id @default(uuid())
+  id                     String   @id @default(cuid())
   firstName              String
   lastName               String
   subscribedToNewsletter Boolean  @default(false)
   email                  String   @unique
   phone                  String?
-  dateCreated            DateTime @default(now())
+  createdAt              DateTime @default(now())
   numOrders              Int @default(0)
 
   cart    Cart?
