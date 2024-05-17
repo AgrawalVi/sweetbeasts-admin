@@ -14,10 +14,12 @@ import {
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import ThemeSwitcher from "@/components/ui/theme-switcher";
+import { useState } from "react";
 
 
 export default function Header() {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
 
   const navItems = [
     {
@@ -65,7 +67,7 @@ export default function Header() {
           ))
         }
       </nav>
-      <Sheet>
+      <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
           <Button
             variant="outline"
@@ -79,7 +81,7 @@ export default function Header() {
         <SheetContent side="left">
           <nav className="grid gap-6 text-lg font-medium">
             <Link
-              href="#"
+              href="/"
               className="flex items-center gap-2 text-lg font-semibold"
             >
               <Package2 className="h-6 w-6"/>
@@ -87,10 +89,15 @@ export default function Header() {
             </Link>
             {
               navItems.map((item, i) => (
-                <Link href={item.path} key={i}
-                      className={cn("transition-colors lg:text-lg hover:text-foreground", item.path === pathname ? "text-foreground" : 'text-muted-foreground')}>
-                  {item.name}
-                </Link>
+                <div className="flex" key={i}>
+                  <div onClick={() => setOpen(false)} className="shrink">
+                    <Link href={item.path}
+                          className={cn("transition-colors lg:text-lg hover:text-foreground", item.path === pathname ? "text-foreground" : 'text-muted-foreground')}>
+                      {item.name}
+                    </Link>
+                  </div>
+                  <div className="grow"></div>
+                </div>
               ))
             }
           </nav>
