@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import ThemeSwitcher from "@/components/ui/theme-switcher";
 
 
 export default function Header() {
@@ -98,7 +99,7 @@ export default function Header() {
       <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
         <form className="ml-auto flex-1 sm:flex-initial">
           <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground"/>
+            <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground"/>
             <Input
               type="search"
               placeholder="Search products..."
@@ -106,6 +107,7 @@ export default function Header() {
             />
           </div>
         </form>
+        <ThemeSwitcher />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">
