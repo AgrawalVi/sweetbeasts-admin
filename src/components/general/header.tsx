@@ -15,6 +15,8 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import ThemeSwitcher from "@/components/ui/theme-switcher";
 import { useState } from "react";
+import { signOut } from "@/auth";
+import LogoutButton from "../auth/logout-button";
 
 
 export default function Header() {
@@ -128,7 +130,10 @@ export default function Header() {
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator/>
-            <DropdownMenuItem>Logout</DropdownMenuItem>
+            <DropdownMenuItem>
+              {/* <LogoutButton /> */}
+              Sign Out
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
