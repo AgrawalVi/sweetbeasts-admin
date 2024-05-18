@@ -8,80 +8,88 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// prisma/schema.prisma
 datasource db {
   provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL")
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+  url  	    = env("DATABASE_URL")
 }
 
-model Product {
-  id           Int     @id @default(autoincrement())
-  name         String
-  priceInCents Int
-  imagePath    String
-  description  String
-  inventory    Int     @default(0)
-  available    Boolean @default(false)
-  numSold      Int     @default(0)
-
-  orders  Order[]
-  carts   Cart[]
-  reviews Review[]
+model User {
+  id String @id @default(cuid())
+  firstName String
+  lastName String
 }
 
-model Customer {
-  id                     String   @id @default(cuid())
-  firstName              String
-  lastName               String
-  subscribedToNewsletter Boolean  @default(false)
-  email                  String   @unique
-  phone                  String?
-  createdAt              DateTime @default(now())
-  numOrders              Int @default(0)
 
-  cart    Cart?
-  orders  Order[]
-  reviews Review[]
-}
 
-model AdminUser {
-  id        String   @id @default(uuid())
-  userRole  Int
-  active    Boolean  @default(true)
-  lastLogin DateTime
-}
+// model Product {
+//   id           Int     @id @default(autoincrement())
+//   name         String
+//   priceInCents Int
+//   imagePath    String
+//   description  String
+//   inventory    Int     @default(0)
+//   available    Boolean @default(false)
+//   numSold      Int     @default(0)
 
-model Order {
-  id               Int      @id @default(autoincrement())
-  pricePaidInCents Int[]
-  dateCreated      DateTime @default(now())
-  dateShipped      DateTime
-  trackingNumber   String
-  // Need to add address information
-  //address String
-  status           Int
+//   orders  Order[]
+//   carts   Cart[]
+//   reviews Review[]
+// }
 
-  customerId String
-  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Restrict)
-  products   Product[]
-}
+// model Customer {
+//   id                     String   @id @default(cuid())
+//   firstName              String
+//   lastName               String
+//   subscribedToNewsletter Boolean  @default(false)
+//   email                  String   @unique
+//   phone                  String?
+//   createdAt              DateTime @default(now())
+//   numOrders              Int @default(0)
 
-model Cart {
-  id         String @id @default(uuid())
-  customerId String @unique
+//   cart    Cart?
+//   orders  Order[]
+//   reviews Review[]
+// }
 
-  customer Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  products Product[]
-}
+// model AdminUser {
+//   id        String   @id @default(uuid())
+//   userRole  Int
+//   active    Boolean  @default(true)
+//   lastLogin DateTime
+// }
 
-model Review {
-  id        Int    @id @default(autoincrement())
-  productId Int
-  title     String
-  content   String
-  rating    Int
-  authorId  String
+// model Order {
+//   id               Int      @id @default(autoincrement())
+//   pricePaidInCents Int[]
+//   dateCreated      DateTime @default(now())
+//   dateShipped      DateTime
+//   trackingNumber   String
+//   // Need to add address information
+//   //address String
+//   status           Int
 
-  product Product  @relation(fields: [productId], references: [id])
-  author  Customer @relation(fields: [authorId], references: [id])
-}
+//   customerId String
+//   customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Restrict)
+//   products   Product[]
+// }
+
+// model Cart {
+//   id         String @id @default(uuid())
+//   customerId String @unique
+
+//   customer Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+//   products Product[]
+// }
+
+// model Review {
+//   id        Int    @id @default(autoincrement())
+//   productId Int
+//   title     String
+//   content   String
+//   rating    Int
+//   authorId  String
+
+//   product Product  @relation(fields: [productId], references: [id])
+//   author  Customer @relation(fields: [authorId], references: [id])
+// }
