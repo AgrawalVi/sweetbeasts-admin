@@ -14,6 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import { useSearchParams } from 'next/navigation';
 
 import * as z from "zod"
 import { LoginSchema } from "@/schemas"
@@ -24,6 +25,9 @@ import { FormSuccess } from "@/components/general/form-success";
 import { login } from "@/actions/login";
 
 export const LoginForm = ({}) => {
+
+  const searchParams = useSearchParams();
+  const urlError = searchParams.get('error') === "OAuthAccountNotLinked" ? "An account already exists with this email" : ""
 
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | undefined>("");
@@ -41,7 +45,7 @@ export const LoginForm = ({}) => {
     startTransition(() =>
     {
       login(values).then((data) => {
-        if (data) setError(data.error);
+        setError(data?.error);
       })
     })
   }
@@ -52,6 +56,7 @@ export const LoginForm = ({}) => {
       backButtonLabel="Don't have an account?"
       backButtonHref="/auth/register"
       showSocial
+      googleButtonText='Login with Google'
     >
       <Form { ...form }>
         <form
@@ -96,7 +101,7 @@ export const LoginForm = ({}) => {
               )}
             />
           </div>
-          <FormError message={error} />
+          <FormError message={error || urlError} />
           <Button
             type="submit"
             className="w-full"
