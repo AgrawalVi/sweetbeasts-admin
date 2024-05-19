@@ -33,8 +33,7 @@ export const RegisterForm = () => {
       email: "",
       password: "",
       confirmPassword: "",
-      firstName: "",
-      lastName: "",
+      name: "",
     }
   })
 
@@ -63,17 +62,16 @@ export const RegisterForm = () => {
           className="space-y-6"
         >
           <div className="space-y-4">
-            <div className="flex-row flex space-x-4">
               <FormField
                 control={form.control}
-                name="firstName"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>First Name</FormLabel>
+                    <FormLabel>Name</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder="John"
+                        placeholder="John Doe"
                         disabled={isPending}
                       ></Input>
                     </FormControl>
@@ -81,24 +79,6 @@ export const RegisterForm = () => {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="lastName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Doe"
-                        disabled={isPending}
-                      ></Input>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
             <FormField
               control={form.control}
               name="email"

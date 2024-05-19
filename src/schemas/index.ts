@@ -24,12 +24,9 @@ export const RegisterSchema = z.object({
   confirmPassword: z.string().min(8, {
     message: "Minimum 8 characters required"
   }),
-  firstName: z.string().min(1, {
-    message: "First name is required"
+  name: z.string().min(1, {
+    message: "Name is required"
   }),
-  lastName: z.string().min(1, {
-    message: "Last name is required"
-  })
 
 }).refine((data) => {
   return data.password === data.confirmPassword
