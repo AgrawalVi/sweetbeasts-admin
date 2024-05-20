@@ -3,6 +3,7 @@
  */
 export const publicRoutes = [
     "/",
+    '/auth/verify-email'
 ]
 
 /**
