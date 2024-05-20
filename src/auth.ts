@@ -2,7 +2,7 @@ import NextAuth, { type DefaultSession } from "next-auth"
 import { JWT } from "next-auth/jwt"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { UserRole } from "@prisma/client"
-import { getUserById } from "@/businessLogic/user"
+import { getUserById } from "@/data/user"
 import { db } from "@/lib/db"
 import authConfig from "@/auth.config"
 
@@ -30,7 +30,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "/auth/login",
     error: "/auth/error",
   },
-  
+
   events: {
     async linkAccount({ user }) {
       await db.user.update({
@@ -41,15 +41,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
 
   callbacks: {
-    // async signIn({ user })  {
-    //   const existingUser = await getUserById(user.id)
+    async signIn({ user, account })  {
+      // allow 0Auth without email verification
+      if (account?.provider !== "credentials") {
+        return true
+      }
+      
+      const existingUser = await getUserById(user.id)
+      
+      // Prevent sign-in without email verification
+      if (!existingUser?.emailVerified) {
+        return false;
+      }
 
-    //   if (!existingUser || !existingUser.emailVerified) {
-    //     return false;
-    //   }
+      // TOOD: Add 2FA check here
 
-    //   return true
-    // },
+      return true
+    },
     async session({ token, session, user }) {
       console.log({ sessionToken: token })
 

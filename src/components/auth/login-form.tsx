@@ -1,7 +1,6 @@
 'use client'
 
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { useState, useTransition } from "react";
 import { CardWrapper } from "@/components/auth/card-wrapper";
 import { useForm } from "react-hook-form"
@@ -31,6 +30,7 @@ export const LoginForm = ({}) => {
 
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -46,6 +46,7 @@ export const LoginForm = ({}) => {
     {
       login(values).then((data) => {
         setError(data?.error);
+        setSuccess(data?.success)
       })
     })
   }
@@ -102,6 +103,7 @@ export const LoginForm = ({}) => {
             />
           </div>
           <FormError message={error || urlError} />
+          <FormSuccess message={success} />
           <Button
             type="submit"
             className="w-full"

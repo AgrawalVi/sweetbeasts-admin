@@ -5,9 +5,9 @@ import bcrypt from "bcryptjs"
 import { db } from "@/lib/db"
 
 import { RegisterSchema } from "@/schemas"
-import { getUserByEmail } from "@/businessLogic/user"
-
-
+import { getUserByEmail } from "@/data/user"
+import { generateVerificationToken } from "@/data/tokens"
+import { sendVerificationEmail } from "@/lib/mail"
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
   const validatedFields = RegisterSchema.safeParse(values)
@@ -23,7 +23,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
   const existingUser = await getUserByEmail(email);
   
   if (existingUser) {
-    return { error: "Email already taken!" };
+    return { error: "Account already exists, please Login!" };
   }
 
   await db.user.create({
@@ -34,7 +34,10 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     }
   })
 
-  // TODO: SEND VERIFICATION TOKEN EMAIL
+  const verificationToken = await generateVerificationToken(email);
+  console.log("verificationToken", verificationToken)
+  
+  await sendVerificationEmail(verificationToken.email, verificationToken.token);
 
-  return { success: "User created!" }
+  return { success: "Confirmation email sent!" }
 }
