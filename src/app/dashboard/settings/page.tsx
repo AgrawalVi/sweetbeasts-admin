@@ -2,7 +2,7 @@
 
 import { logout } from "@/actions/logout"
 import { signOut } from "next-auth/react"
-import { useCurrentUser } from "@/hooks/useCurrentUser"
+import { useCurrentUser } from "@/hooks/use-current-user"
 
 const SettingsPage = () => {
   const user = useCurrentUser()

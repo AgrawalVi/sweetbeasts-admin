@@ -15,6 +15,7 @@ declare module "next-auth" {
   interface Session {
     user: {
       role: UserRole
+      isTwoFactorEnabled: boolean
     } & DefaultSession["user"]
   }
 }
@@ -22,6 +23,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     role?: UserRole
+    isTwoFactorEnabled: boolean
   }
 }
 
@@ -54,8 +56,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return false
       }
 
+      // if (existingUser.role !== "ADMIN") {
+      //   return false
+      // }
+
       if (existingUser.isTwoFactorEnabled) {
-        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id)
+        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
+          existingUser.id
+        )
 
         if (!twoFactorConfirmation) {
           return false
@@ -65,7 +73,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         await db.twoFactorConfirmation.delete({
           where: { id: twoFactorConfirmation.id },
         })
-
       }
 
       return true
@@ -80,6 +87,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token.sub && session.user) {
         session.user.id = token.sub
       }
+
+      if (session.user) {
+        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled
+      }
       return session
     },
     async jwt({ token }) {
@@ -90,6 +101,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (!existingUser) return token
 
       token.role = existingUser.role
+      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled
       return token
     },
   },
