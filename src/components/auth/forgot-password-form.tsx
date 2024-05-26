@@ -23,7 +23,7 @@ import { FormSuccess } from "@/components/general/form-success"
 import { login } from "@/actions/login"
 import Link from "next/link"
 
-export const LoginForm = ({}) => {
+export const ForgotPasswordForm = ({}) => {
   const searchParams = useSearchParams()
   const urlError =
     searchParams.get("error") === "OAuthAccountNotLinked"
@@ -54,11 +54,9 @@ export const LoginForm = ({}) => {
 
   return (
     <CardWrapper
-      headerLabel="Please login below"
-      backButtonLabel="Don't have an account?"
-      backButtonHref="/auth/register"
-      showSocial
-      googleButtonText="Login with Google"
+      headerLabel="Reset your password"
+      backButtonLabel="Back to login"
+      backButtonHref="/auth/login"
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

@@ -28,12 +28,11 @@ export const CardWrapper = ({
         <CardHeader>
           <Header label={headerLabel} />
         </CardHeader>
-        <CardContent>
+        <CardContent className="pb-3">
           { children }
-
         </CardContent>
         {showSocial && (
-          <CardFooter>
+          <CardFooter className="pb-3">
             <Social googleButtonText={googleButtonText} />
           </CardFooter>
         )}
