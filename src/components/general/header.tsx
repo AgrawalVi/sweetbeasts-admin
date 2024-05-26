@@ -17,6 +17,7 @@ import ThemeSwitcher from "@/components/ui/theme-switcher";
 import { useState } from "react";
 import { signOut } from "@/auth";
 import LogoutButton from "../auth/logout-button";
+import UserButton from "./user-button";
 
 
 export default function Header() {
@@ -117,6 +118,7 @@ export default function Header() {
           </div>
         </form>
         <ThemeSwitcher />
+        <UserButton />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">
@@ -131,8 +133,8 @@ export default function Header() {
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator/>
             <DropdownMenuItem>
-              {/* <LogoutButton /> */}
-              Sign Out
+              <LogoutButton />
+              {/* Sign Out */}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

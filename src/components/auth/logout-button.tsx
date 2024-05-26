@@ -1,20 +1,11 @@
-'use server'
-
-import { signOut } from "@/auth";
-import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react"
 
 const LogoutButton = () => {
-    const router = useRouter();
-    return ( 
-        <form action={async () => {
-            'use server'
-            await signOut();
-        }}>
-            <button type='submit' >
-                Sign Out
-            </button>
-        </form>
-     );
+    const onClick = () => {
+        signOut()
+    }
+
+    return <button onClick={onClick}>Sign Out</button>
 }
 
-export default LogoutButton;
+export default LogoutButton
