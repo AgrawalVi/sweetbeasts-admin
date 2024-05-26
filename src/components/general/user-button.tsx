@@ -3,6 +3,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -27,6 +29,11 @@ export default function UserButton() {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>Settings</DropdownMenuItem>
+        <DropdownMenuItem>Support</DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem>
           <LogoutButton />
         </DropdownMenuItem>
