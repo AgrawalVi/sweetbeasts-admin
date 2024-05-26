@@ -58,7 +58,7 @@ export const LoginForm = ({}) => {
       backButtonLabel="Don't have an account?"
       backButtonHref="/auth/register"
       showSocial
-      googleButtonText="Login with Google"
+      googleButtonText="Continue with Google"
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

@@ -55,7 +55,7 @@ export const RegisterForm = () => {
       backButtonLabel="Already have an account?"
       backButtonHref="/auth/login"
       showSocial
-      googleButtonText='Register with Google'
+      googleButtonText='Continue with Google'
     >
       <Form { ...form }>
         <form
