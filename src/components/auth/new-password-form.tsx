@@ -15,30 +15,34 @@ import {
 } from "@/components/ui/form"
 
 import * as z from "zod"
-import { ResetPasswordSchema } from "@/schemas"
+import { NewPasswordSchema } from "@/schemas"
 import { Button } from "@/components/ui/button"
 import { FormError } from "@/components/general/form-error"
 import { FormSuccess } from "@/components/general/form-success"
-import { resetPassword } from "@/actions/resetPassword"
+import { newPassword } from "@/actions/newPassword"
+import { useSearchParams } from "next/navigation"
 
+export const NewPasswordForm = ({}) => {
+  const searchParams = useSearchParams()
+  const token = searchParams.get("token")
 
-export const ForgotPasswordForm = ({}) => {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | undefined>("")
   const [success, setSuccess] = useState<string | undefined>("")
 
-  const form = useForm<z.infer<typeof ResetPasswordSchema>>({
-    resolver: zodResolver(ResetPasswordSchema),
+  const form = useForm<z.infer<typeof NewPasswordSchema>>({
+    resolver: zodResolver(NewPasswordSchema),
     defaultValues: {
-      email: "",
+      password: "",
+      confirmPassword: "",
     },
   })
 
-  const onSubmit = (values: z.infer<typeof ResetPasswordSchema>) => {
+  const onSubmit = (values: z.infer<typeof NewPasswordSchema>) => {
     setError("")
 
     startTransition(() => {
-      resetPassword(values).then((data) => {
+      newPassword(values, token).then((data) => {
         setError(data?.error)
         setSuccess(data?.success)
       })
@@ -47,7 +51,7 @@ export const ForgotPasswordForm = ({}) => {
 
   return (
     <CardWrapper
-      headerLabel="Reset your password"
+      headerLabel="Enter a new password"
       backButtonLabel="Back to login"
       backButtonHref="/auth/login"
     >
@@ -56,14 +60,33 @@ export const ForgotPasswordForm = ({}) => {
           <div className="space-y-4">
             <FormField
               control={form.control}
-              name="email"
+              name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="john.doe@example.com"
+                      placeholder="sweetbeasts123"
+                      type="password"
+                      disabled={isPending}
+                    ></Input>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="sweetbeasts123"
+                      type="password"
                       disabled={isPending}
                     ></Input>
                   </FormControl>
@@ -75,7 +98,7 @@ export const ForgotPasswordForm = ({}) => {
           <FormError message={error} />
           <FormSuccess message={success} />
           <Button type="submit" className="w-full" disabled={isPending}>
-            Send reset email
+            Change your password
           </Button>
         </form>
       </Form>
