@@ -1,13 +1,14 @@
 import NextAuth, { type DefaultSession } from "next-auth"
 import { JWT } from "next-auth/jwt"
 import { PrismaAdapter } from "@auth/prisma-adapter"
-import { UserRole } from "@prisma/client"
-import { getUserById } from "@/data/user"
 import { db } from "@/lib/db"
+import { UserRole } from "@prisma/client"
 import authConfig from "@/auth.config"
 
+import { getUserById } from "@/data/user"
+import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation"
+
 declare module "next-auth" {
-  
   /**
    * Add any extra fields to the session that are not part of the default session
    */
@@ -25,7 +26,6 @@ declare module "next-auth/jwt" {
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-
   pages: {
     signIn: "/auth/login",
     error: "/auth/error",
@@ -37,24 +37,36 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         where: { id: user.id },
         data: { emailVerified: new Date() },
       })
-    }
+    },
   },
 
   callbacks: {
-    async signIn({ user, account })  {
+    async signIn({ user, account }) {
       // allow 0Auth without email verification
       if (account?.provider !== "credentials") {
         return true
       }
-      
+
       const existingUser = await getUserById(user.id)
-      
+
       // Prevent sign-in without email verification
       if (!existingUser?.emailVerified) {
-        return false;
+        return false
       }
 
-      // TOOD: Add 2FA check here
+      if (existingUser.isTwoFactorEnabled) {
+        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id)
+
+        if (!twoFactorConfirmation) {
+          return false
+        }
+
+        // Delete two factor conformation for next sign in
+        await db.twoFactorConfirmation.delete({
+          where: { id: twoFactorConfirmation.id },
+        })
+
+      }
 
       return true
     },

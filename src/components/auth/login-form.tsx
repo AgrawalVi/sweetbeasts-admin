@@ -1,10 +1,13 @@
 "use client"
 
-import { Input } from "@/components/ui/input"
 import { useState, useTransition } from "react"
-import { CardWrapper } from "@/components/auth/card-wrapper"
+import { useSearchParams } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+
+import { REGEXP_ONLY_DIGITS } from "input-otp"
+import { Input } from "@/components/ui/input"
+import { CardWrapper } from "@/components/auth/card-wrapper"
 import {
   Form,
   FormControl,
@@ -13,7 +16,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { useSearchParams } from "next/navigation"
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp"
 
 import * as z from "zod"
 import { LoginSchema } from "@/schemas"
@@ -31,6 +38,7 @@ export const LoginForm = ({}) => {
       : ""
 
   const [isPending, startTransition] = useTransition()
+  const [showTwoFactor, setShowTwoFactor] = useState(false)
   const [error, setError] = useState<string | undefined>("")
   const [success, setSuccess] = useState<string | undefined>("")
 
@@ -39,80 +47,125 @@ export const LoginForm = ({}) => {
     defaultValues: {
       email: "",
       password: "",
+      code: "",
     },
   })
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+    console.log(values)
     setError("")
     startTransition(() => {
-      login(values).then((data) => {
-        setError(data?.error)
-        setSuccess(data?.success)
-      })
+      login(values)
+        .then((data) => {
+          if (data?.error) {
+            form.reset()
+            setError(data.error)
+          }
+          if (data?.success) {
+            form.reset()
+            setSuccess(data.success)
+          }
+          if (data?.twoFactor) {
+            setShowTwoFactor(true)
+          }
+        })
+        .catch(() => setError("Something went wrong"))
     })
   }
 
   return (
     <CardWrapper
-      headerLabel="Please login below"
-      backButtonLabel="Don't have an account?"
+      headerLabel={showTwoFactor ? "Two Factor Authentication" : "Please login below"}
+      backButtonLabel={showTwoFactor ? "Create an account" : "Don't have an account?"}
       backButtonHref="/auth/register"
-      showSocial
+      showSocial = {!showTwoFactor}
       googleButtonText="Continue with Google"
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="john.doe@example.com"
-                      disabled={isPending}
-                    ></Input>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div>
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="sweetbeasts123"
-                        type="password"
-                        disabled={isPending}
-                      ></Input>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                variant="link"
-                size="sm"
-                className="text-black font-normal text-xs px-0 "
-                asChild
-              >
-                <Link href="/auth/reset-password">Forgot your password?</Link>
-              </Button>
-            </div>
+            {showTwoFactor && (
+              <div className="flex w-full justify-center">
+                <FormField
+                  control={form.control}
+                  name="code"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col text-center my-2">
+                      <FormLabel>Two Factor Code</FormLabel>
+                      <FormControl>
+                        <InputOTP maxLength={6} {...field} pattern={REGEXP_ONLY_DIGITS}>
+                          <InputOTPGroup>
+                            <InputOTPSlot index={0} />
+                            <InputOTPSlot index={1} />
+                            <InputOTPSlot index={2} />
+                            <InputOTPSlot index={3} />
+                            <InputOTPSlot index={4} />
+                            <InputOTPSlot index={5} />
+                          </InputOTPGroup>
+                        </InputOTP>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
+            {!showTwoFactor && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="john.doe@example.com"
+                          disabled={isPending}
+                        ></Input>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="sweetbeasts123"
+                            type="password"
+                            disabled={isPending}
+                          ></Input>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="text-black font-normal text-xs px-0 "
+                    asChild
+                  >
+                    <Link href="/auth/reset-password">
+                      Forgot your password?
+                    </Link>
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
           <FormError message={error || urlError} />
           <FormSuccess message={success} />
           <Button type="submit" className="w-full" disabled={isPending}>
-            Login
+            {showTwoFactor ? "Confirm" : "Login"}
           </Button>
         </form>
       </Form>
