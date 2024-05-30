@@ -27,7 +27,7 @@ import { LoginSchema } from "@/schemas"
 import { Button } from "@/components/ui/button"
 import { FormError } from "@/components/general/form-error"
 import { FormSuccess } from "@/components/general/form-success"
-import { login } from "@/actions/login"
+import { login } from "@/actions/auth/login"
 import Link from "next/link"
 
 export const LoginForm = ({}) => {

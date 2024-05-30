@@ -19,7 +19,7 @@ import { RegisterSchema } from "@/schemas"
 import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/general/form-error";
 import { FormSuccess } from "@/components/general/form-success";
-import { register } from "@/actions/register";
+import { register } from "@/actions/auth/register";
 
 export const RegisterForm = () => {
 

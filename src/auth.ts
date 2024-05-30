@@ -5,8 +5,8 @@ import { db } from "@/lib/db"
 import { UserRole } from "@prisma/client"
 import authConfig from "@/auth.config"
 
-import { getUserById } from "@/data/user"
-import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation"
+import { getUserById } from "@/data/auth/user"
+import { getTwoFactorConfirmationByUserId } from "@/data/auth/two-factor-confirmation"
 
 declare module "next-auth" {
   /**

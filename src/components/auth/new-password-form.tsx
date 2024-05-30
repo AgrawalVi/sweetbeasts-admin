@@ -19,7 +19,7 @@ import { NewPasswordSchema } from "@/schemas"
 import { Button } from "@/components/ui/button"
 import { FormError } from "@/components/general/form-error"
 import { FormSuccess } from "@/components/general/form-success"
-import { newPassword } from "@/actions/newPassword"
+import { newPassword } from "@/actions/auth/newPassword"
 import { useSearchParams } from "next/navigation"
 
 export const NewPasswordForm = ({}) => {
