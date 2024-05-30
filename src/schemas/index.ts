@@ -1,5 +1,7 @@
 import * as z from "zod"
 
+// AUTH SCHEMAS
+
 export const LoginSchema = z.object({
   email: z
     .string()
@@ -74,3 +76,17 @@ export const NewPasswordSchema = z
       path: ["confirmPassword"],
     }
   )
+
+// ADMIN PORTAL SCHEMAS
+
+export const CreateProductSchema = z.object({
+  name: z.string().min(1, {
+    message: "Name is required",
+  }),
+  description: z.string().min(1, {
+    message: "Description is required",
+  }),
+  priceInCents: z.string()
+    .transform((value) => parseFloat(value)) // Ensure it's a valid number // Convert the input to a float
+    .refine((value) => !isNaN(value), "The value must be a number"), 
+})
