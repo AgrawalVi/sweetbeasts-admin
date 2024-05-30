@@ -3,6 +3,7 @@
 import * as z from "zod"
 
 import { db } from "@/lib/db"
+import { stripe } from "@/lib/stripe"
 import { CreateProductSchema } from "@/schemas"
 import { getProductByName } from "@/data/admin/products"
 
@@ -24,13 +25,37 @@ export const createProduct = async (
     return { error: "Product with this name already exists" }
   }
 
-  await db.product.create({
-    data: {
+  let stripeProduct = null
+  try {
+    stripeProduct = await stripe.products.create({
       name,
-      description, 
-      priceInCents,
-      quantity
+      description,
+      shippable: true,
+      url: `https://sweetbeasts.shop/products/${name}`,
+      default_price_data: {
+        currency: "usd",
+        unit_amount: priceInCents,
+      },
+    })
+  } catch {
+    return { error: "Failed to create product in stripe" }
+  }
+  console.log('stripeProduct', stripeProduct)
+  if (stripeProduct) {
+    try {
+      await db.product.create({
+        data: {
+          name,
+          description,
+          priceInCents,
+          quantity,
+          stripeProductId: stripeProduct.id,
+        },
+      })
+    } catch {
+      return { error: "Failed to create product" }
     }
-  })
-  return { success: "Product created" }
+  }
+
+  return { success: "Product created successfully" }
 }
