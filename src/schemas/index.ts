@@ -86,7 +86,6 @@ export const CreateProductSchema = z.object({
   description: z.string().min(1, {
     message: "Description is required",
   }),
-  priceInCents: z.string()
-    .transform((value) => parseFloat(value)) // Ensure it's a valid number // Convert the input to a float
-    .refine((value) => !isNaN(value), "The value must be a number"), 
+  priceInCents: z.coerce.number(),
+  quantity: z.coerce.number()
 })

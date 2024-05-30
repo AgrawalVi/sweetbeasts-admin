@@ -108,8 +108,8 @@ model Product {
   name String @unique
   priceInCents Int
   description String
+  quantity Int
 }
-
 
 // model Product {
 //   id           Int     @id @default(autoincrement())

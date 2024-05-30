@@ -15,6 +15,7 @@ import {
 import { CreateProductSchema } from "@/schemas"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
+import { createProduct } from "@/actions/products/create-product"
 
 export default function CreateProductForm() {
   const { toast } = useToast()
@@ -25,14 +26,21 @@ export default function CreateProductForm() {
       name: "",
       description: "",
       priceInCents: 0,
+      quantity: 0,
     },
   })
 
-  function onSubmit(values: z.infer<typeof CreateProductSchema>) {
-    toast({
-      title: "product added",
-      description: `Product ${values.name} with description ${values.description} and price ${values.priceInCents} added successfully`,
-    })
+  async function onSubmit(values: z.infer<typeof CreateProductSchema>) {
+
+    let result = await createProduct(values)
+
+    if (result.success) {
+      toast({title: "Product added", description: `${values.name} added successfully`})
+    }
+
+    if (result.error) {
+      toast({title: "ERROR", description: result.error, variant: "destructive"})
+    }
   }
 
   return (
@@ -76,6 +84,20 @@ export default function CreateProductForm() {
                 <Input placeholder="100" type='number' {...field} />
               </FormControl>
               <FormDescription>Enter the price of the product, in cents</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="quantity"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Quantity</FormLabel>
+              <FormControl>
+                <Input placeholder="5" type='number' {...field} />
+              </FormControl>
+              <FormDescription>Enter the initial quantity of the product to make available</FormDescription>
               <FormMessage />
             </FormItem>
           )}
