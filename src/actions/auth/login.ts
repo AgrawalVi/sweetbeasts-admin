@@ -7,10 +7,10 @@ import { signIn } from "@/auth"
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes"
 import { AuthError } from "next-auth"
 import { generateVerificationToken, generateTwoFactorToken } from "@/lib/tokens"
-import { getUserByEmail } from "@/data/user"
-import { getTwoFactorTokenByEmail } from "@/data/two-factor-token"
+import { getUserByEmail } from "@/data/auth/user"
+import { getTwoFactorTokenByEmail } from "@/data/auth/two-factor-token"
 import { sendVerificationEmail, sendTwoFactorEmail } from "@/lib/mail"
-import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation"
+import { getTwoFactorConfirmationByUserId } from "@/data/auth/two-factor-confirmation"
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
   const validatedFields = LoginSchema.safeParse(values)
