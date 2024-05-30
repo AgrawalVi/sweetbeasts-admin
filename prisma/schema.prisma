@@ -105,7 +105,7 @@ model Cart {
 
 model Product {
   id Int @id @default(autoincrement())
-  name String
+  name String @unique
   priceInCents Int
   description String
 }
