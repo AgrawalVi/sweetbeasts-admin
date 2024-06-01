@@ -30,11 +30,12 @@ model User {
   accounts              Account[]
   isTwoFactorEnabled    Boolean                @default(false)
   twoFactorConfirmation TwoFactorConfirmation?
+  numPurchases          Int                    @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  cart Cart?
+  cartItems CartItem[]
 }
 
 model Account {
@@ -94,40 +95,37 @@ model TwoFactorConfirmation {
   @@unique([userId])
 }
 
-model Cart {
-  id         String   @id @default(cuid())
-  userId     String   @unique
-  productIds String[]
-  quantities Int[]
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  userId    String?
+  guestId   String?
+  createdAt DateTime @default(now())
+  quantity  Int
+  productId Int
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Product Product? @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId]) // user can only have 1 product active at a time
+  @@unique([guestId, productId]) // guest can only have 1 product active at a time
 }
 
 model Product {
-  id Int @id @default(autoincrement())
-  name String @unique
-  priceInCents Int
-  description String
-  quantity Int
-  stripeProductId String? @unique
+  id               Int      @id @default(autoincrement())
+  name             String   @unique
+  priceInCents     Int
+  description      String
+  stripeProductId  String   @unique
+  primaryImagePath String?
+  numSold          Int      @default(0)
+  dateCreated      DateTime @default(now())
+  inventory        Int      @default(0)
+  available        Boolean  @default(true)
+
+  cartItems CartItem[]
 }
 
-// model Product {
-//   id           Int     @id @default(autoincrement())
-//   name         String
-//   priceInCents Int
-//   imagePath    String
-//   description  String
-//   inventory    Int     @default(0)
-//   available    Boolean @default(false)
-//   numSold      Int     @default(0)
-
-//   orders  Order[]
-//   carts   Cart[]
-//   reviews Review[]
-// }
-
-// model Customer {
+// model user {
 //   id                     String   @id @default(cuid())
 //   firstName              String
 //   lastName               String
@@ -142,13 +140,6 @@ model Product {
 //   reviews Review[]
 // }
 
-// model AdminUser {
-//   id        String   @id @default(uuid())
-//   userRole  Int
-//   active    Boolean  @default(true)
-//   lastLogin DateTime
-// }
-
 // model Order {
 //   id               Int      @id @default(autoincrement())
 //   pricePaidInCents Int[]
@@ -159,17 +150,9 @@ model Product {
 //   //address String
 //   status           Int
 
-//   customerId String
-//   customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Restrict)
+//   userId String
+//   user   user  @relation(fields: [userId], references: [id], onDelete: Restrict)
 //   products   Product[]
-// }
-
-// model Cart {
-//   id         String @id @default(uuid())
-//   customerId String @unique
-
-//   customer Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
-//   products Product[]
 // }
 
 // model Review {
@@ -181,5 +164,5 @@ model Product {
 //   authorId  String
 
 //   product Product  @relation(fields: [productId], references: [id])
-//   author  Customer @relation(fields: [authorId], references: [id])
+//   author  user @relation(fields: [authorId], references: [id])
 // }

@@ -48,11 +48,12 @@ export const createProduct = async (
           name,
           description,
           priceInCents,
-          quantity,
+          inventory: quantity,
           stripeProductId: stripeProduct.id,
         },
       })
-    } catch {
+    } catch (e) {
+      console.log(e)
       return { error: "Failed to create product" }
     }
   }
