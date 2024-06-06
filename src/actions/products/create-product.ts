@@ -40,7 +40,8 @@ export const createProduct = async (
   } catch {
     return { error: "Failed to create product in stripe" }
   }
-  console.log('stripeProduct', stripeProduct)
+  console.log("stripeProduct", stripeProduct)
+
   if (stripeProduct) {
     try {
       await db.product.create({
@@ -50,6 +51,7 @@ export const createProduct = async (
           priceInCents,
           inventory: quantity,
           stripeProductId: stripeProduct.id,
+          stripePriceId: stripeProduct.default_price as string,
         },
       })
     } catch (e) {
