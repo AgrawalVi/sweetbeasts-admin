@@ -5,12 +5,12 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu'
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { CircleUser } from "lucide-react"
-import { useCurrentUser } from "@/hooks/use-current-user"
-import LogoutButton from "../auth/logout-button"
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { CircleUser } from 'lucide-react'
+import { useCurrentUser } from '@/hooks/use-current-user'
+import LogoutButton from '../auth/logout-button'
 
 export default function UserButton() {
   const user = useCurrentUser()
@@ -20,10 +20,10 @@ export default function UserButton() {
       <DropdownMenuTrigger>
         <Avatar>
           <AvatarImage
-            src={user?.image || ""}
-            className="hover:opacity-80 transition-all"
+            src={user?.image || ''}
+            className="transition-all hover:opacity-80"
           />
-          <AvatarFallback className="bg-secondary hover:opacity-80 transition-all text-secondary-foreground">
+          <AvatarFallback className="bg-secondary text-secondary-foreground transition-all hover:opacity-80">
             <CircleUser />
           </AvatarFallback>
         </Avatar>

@@ -1,20 +1,20 @@
-"use server"
+'use server'
 
-import * as z from "zod"
+import * as z from 'zod'
 
-import { db } from "@/lib/db"
-import { stripe } from "@/lib/stripe"
-import { CreateProductSchema } from "@/schemas"
-import { getProductByName } from "@/data/admin/products"
+import { db } from '@/lib/db'
+import { stripe } from '@/lib/stripe'
+import { CreateProductSchema } from '@/schemas'
+import { getProductByName } from '@/data/admin/products'
 
 export const createProduct = async (
-  values: z.infer<typeof CreateProductSchema>
+  values: z.infer<typeof CreateProductSchema>,
 ) => {
   console.log(values)
   const validatedFields = CreateProductSchema.safeParse(values)
 
   if (!validatedFields.success) {
-    return { error: "Invalid fields" }
+    return { error: 'Invalid fields' }
   }
 
   const { name, quantity, priceInCents, description } = validatedFields.data
@@ -22,7 +22,7 @@ export const createProduct = async (
   const existingProduct = await getProductByName(name)
 
   if (existingProduct) {
-    return { error: "Product with this name already exists" }
+    return { error: 'Product with this name already exists' }
   }
 
   let stripeProduct = null
@@ -33,14 +33,14 @@ export const createProduct = async (
       shippable: true,
       url: `https://sweetbeasts.shop/products/${name}`,
       default_price_data: {
-        currency: "usd",
+        currency: 'usd',
         unit_amount: priceInCents,
       },
     })
   } catch {
-    return { error: "Failed to create product in stripe" }
+    return { error: 'Failed to create product in stripe' }
   }
-  console.log("stripeProduct", stripeProduct)
+  console.log('stripeProduct', stripeProduct)
 
   if (stripeProduct) {
     try {
@@ -56,9 +56,9 @@ export const createProduct = async (
       })
     } catch (e) {
       console.log(e)
-      return { error: "Failed to create product" }
+      return { error: 'Failed to create product' }
     }
   }
 
-  return { success: "Product created successfully" }
+  return { success: 'Product created successfully' }
 }

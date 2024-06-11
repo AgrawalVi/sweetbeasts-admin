@@ -1,13 +1,13 @@
-"use client"
+'use client'
 
-import { useState, useTransition } from "react"
-import { useSearchParams } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { useState, useTransition } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 
-import { REGEXP_ONLY_DIGITS } from "input-otp"
-import { Input } from "@/components/ui/input"
-import { CardWrapper } from "@/components/auth/card-wrapper"
+import { REGEXP_ONLY_DIGITS } from 'input-otp'
+import { Input } from '@/components/ui/input'
+import { CardWrapper } from '@/components/auth/card-wrapper'
 import {
   Form,
   FormControl,
@@ -15,45 +15,45 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from '@/components/ui/form'
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from "@/components/ui/input-otp"
+} from '@/components/ui/input-otp'
 
-import * as z from "zod"
-import { LoginSchema } from "@/schemas"
-import { Button } from "@/components/ui/button"
-import { FormError } from "@/components/general/form-error"
-import { FormSuccess } from "@/components/general/form-success"
-import { login } from "@/actions/auth/login"
-import Link from "next/link"
+import * as z from 'zod'
+import { LoginSchema } from '@/schemas'
+import { Button } from '@/components/ui/button'
+import { FormError } from '@/components/general/form-error'
+import { FormSuccess } from '@/components/general/form-success'
+import { login } from '@/actions/auth/login'
+import Link from 'next/link'
 
 export const LoginForm = ({}) => {
   const searchParams = useSearchParams()
   const urlError =
-    searchParams.get("error") === "OAuthAccountNotLinked"
-      ? "An account already exists with this email"
-      : ""
+    searchParams.get('error') === 'OAuthAccountNotLinked'
+      ? 'An account already exists with this email'
+      : ''
 
   const [isPending, startTransition] = useTransition()
   const [showTwoFactor, setShowTwoFactor] = useState(false)
-  const [error, setError] = useState<string | undefined>("")
-  const [success, setSuccess] = useState<string | undefined>("")
+  const [error, setError] = useState<string | undefined>('')
+  const [success, setSuccess] = useState<string | undefined>('')
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
-      email: "",
-      password: "",
-      code: "",
+      email: '',
+      password: '',
+      code: '',
     },
   })
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     console.log(values)
-    setError("")
+    setError('')
     startTransition(() => {
       login(values)
         .then((data) => {
@@ -69,16 +69,20 @@ export const LoginForm = ({}) => {
             setShowTwoFactor(true)
           }
         })
-        .catch(() => setError("Something went wrong"))
+        .catch(() => setError('Something went wrong'))
     })
   }
 
   return (
     <CardWrapper
-      headerLabel={showTwoFactor ? "Two Factor Authentication" : "Please login below"}
-      backButtonLabel={showTwoFactor ? "Create an account" : "Don't have an account?"}
+      headerLabel={
+        showTwoFactor ? 'Two Factor Authentication' : 'Please login below'
+      }
+      backButtonLabel={
+        showTwoFactor ? 'Create an account' : "Don't have an account?"
+      }
       backButtonHref="/auth/register"
-      showSocial = {!showTwoFactor}
+      showSocial={!showTwoFactor}
       googleButtonText="Continue with Google"
     >
       <Form {...form}>
@@ -90,10 +94,14 @@ export const LoginForm = ({}) => {
                   control={form.control}
                   name="code"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col text-center my-2">
+                    <FormItem className="my-2 flex flex-col text-center">
                       <FormLabel>Two Factor Code</FormLabel>
                       <FormControl>
-                        <InputOTP maxLength={6} {...field} pattern={REGEXP_ONLY_DIGITS}>
+                        <InputOTP
+                          maxLength={6}
+                          {...field}
+                          pattern={REGEXP_ONLY_DIGITS}
+                        >
                           <InputOTPGroup>
                             <InputOTPSlot index={0} />
                             <InputOTPSlot index={1} />
@@ -151,7 +159,7 @@ export const LoginForm = ({}) => {
                   <Button
                     variant="link"
                     size="sm"
-                    className="text-black font-normal text-xs px-0 "
+                    className="px-0 text-xs font-normal text-black"
                     asChild
                   >
                     <Link href="/auth/reset-password">
@@ -165,7 +173,7 @@ export const LoginForm = ({}) => {
           <FormError message={error || urlError} />
           <FormSuccess message={success} />
           <Button type="submit" className="w-full" disabled={isPending}>
-            {showTwoFactor ? "Confirm" : "Login"}
+            {showTwoFactor ? 'Confirm' : 'Login'}
           </Button>
         </form>
       </Form>

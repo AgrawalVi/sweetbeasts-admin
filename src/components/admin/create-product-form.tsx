@@ -1,7 +1,7 @@
-import * as z from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { useToast } from "@/components/ui/use-toast"
+import * as z from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { useToast } from '@/components/ui/use-toast'
 
 import {
   Form,
@@ -11,11 +11,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { CreateProductSchema } from "@/schemas"
-import { Input } from "../ui/input"
-import { Button } from "../ui/button"
-import { createProduct } from "@/actions/products/create-product"
+} from '@/components/ui/form'
+import { CreateProductSchema } from '@/schemas'
+import { Input } from '../ui/input'
+import { Button } from '../ui/button'
+import { createProduct } from '@/actions/products/create-product'
 
 export default function CreateProductForm() {
   const { toast } = useToast()
@@ -23,23 +23,29 @@ export default function CreateProductForm() {
   const form = useForm<z.infer<typeof CreateProductSchema>>({
     resolver: zodResolver(CreateProductSchema),
     defaultValues: {
-      name: "",
-      description: "",
+      name: '',
+      description: '',
       priceInCents: 0,
       quantity: 0,
     },
   })
 
   async function onSubmit(values: z.infer<typeof CreateProductSchema>) {
-
     let result = await createProduct(values)
 
     if (result.success) {
-      toast({title: "Product added", description: `${values.name} added successfully`})
+      toast({
+        title: 'Product added',
+        description: `${values.name} added successfully`,
+      })
     }
 
     if (result.error) {
-      toast({title: "ERROR", description: result.error, variant: "destructive"})
+      toast({
+        title: 'ERROR',
+        description: result.error,
+        variant: 'destructive',
+      })
     }
   }
 
@@ -69,7 +75,9 @@ export default function CreateProductForm() {
               <FormControl>
                 <Input placeholder="very beastly" {...field} />
               </FormControl>
-              <FormDescription>Enter a short description of the product</FormDescription>
+              <FormDescription>
+                Enter a short description of the product
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -81,9 +89,11 @@ export default function CreateProductForm() {
             <FormItem>
               <FormLabel>Price</FormLabel>
               <FormControl>
-                <Input placeholder="100" type='number' {...field} />
+                <Input placeholder="100" type="number" {...field} />
               </FormControl>
-              <FormDescription>Enter the price of the product, in cents</FormDescription>
+              <FormDescription>
+                Enter the price of the product, in cents
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -95,14 +105,16 @@ export default function CreateProductForm() {
             <FormItem>
               <FormLabel>Quantity</FormLabel>
               <FormControl>
-                <Input placeholder="5" type='number' {...field} />
+                <Input placeholder="5" type="number" {...field} />
               </FormControl>
-              <FormDescription>Enter the initial quantity of the product to make available</FormDescription>
+              <FormDescription>
+                Enter the initial quantity of the product to make available
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type='submit'>Add Product</Button>
+        <Button type="submit">Add Product</Button>
       </form>
     </Form>
   )
