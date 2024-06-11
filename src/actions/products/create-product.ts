@@ -6,10 +6,18 @@ import { db } from '@/lib/db'
 import { stripe } from '@/lib/stripe'
 import { CreateProductSchema } from '@/schemas'
 import { getProductByName } from '@/data/admin/products'
+import { currentRole } from '@/lib/auth'
 
 export const createProduct = async (
   values: z.infer<typeof CreateProductSchema>,
 ) => {
+
+  // THIS IS AN ADMIN ONLY ACTION
+  const role = await currentRole()
+  if (role !== 'ADMIN') {
+    return { error: 'You are not authorized to create a product. Please contact an admin for the necessary permissions.' }
+  }
+
   console.log(values)
   const validatedFields = CreateProductSchema.safeParse(values)
 
