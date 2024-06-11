@@ -1,8 +1,3 @@
-
 export default function Customers() {
-  return (
-    <div>
-      customers
-    </div>
-  )
+  return <div>customers</div>
 }

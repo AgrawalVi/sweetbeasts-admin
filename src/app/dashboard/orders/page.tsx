@@ -1,4 +1,4 @@
-import { currentUser } from "@/lib/auth"
+import { currentUser } from '@/lib/auth'
 
 export default async function Orders() {
   const user = await currentUser()

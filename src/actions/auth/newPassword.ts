@@ -1,25 +1,25 @@
-"use server"
+'use server'
 
-import * as z from "zod"
+import * as z from 'zod'
 
-import bcrypt from "bcryptjs"
-import { NewPasswordSchema } from "@/schemas"
-import { getPasswordResetTokenByToken } from "@/data/auth/reset-password-token"
-import { getUserByEmail } from "@/data/auth/user"
-import { db } from "@/lib/db"
+import bcrypt from 'bcryptjs'
+import { NewPasswordSchema } from '@/schemas'
+import { getPasswordResetTokenByToken } from '@/data/auth/reset-password-token'
+import { getUserByEmail } from '@/data/auth/user'
+import { db } from '@/lib/db'
 
 export const newPassword = async (
   values: z.infer<typeof NewPasswordSchema>,
-  token?: string | null
+  token?: string | null,
 ) => {
   if (!token) {
-    return { error: "Missing Token" }
+    return { error: 'Missing Token' }
   }
 
   const validatedFields = NewPasswordSchema.safeParse(values)
 
   if (!validatedFields.success) {
-    return { error: "Invalid fields" }
+    return { error: 'Invalid fields' }
   }
 
   const { password } = validatedFields.data
@@ -27,19 +27,19 @@ export const newPassword = async (
   const existingToken = await getPasswordResetTokenByToken(token)
 
   if (!existingToken) {
-    return { error: "Invalid Token" }
+    return { error: 'Invalid Token' }
   }
 
   const hasExpired = new Date(existingToken.expires) < new Date()
 
   if (hasExpired) {
-    return { error: "Token has expired" }
+    return { error: 'Token has expired' }
   }
 
   const existingUser = await getUserByEmail(existingToken.email)
 
   if (!existingUser) {
-    return { error: "User not found" }
+    return { error: 'User not found' }
   }
 
   const hashedPassword = await bcrypt.hash(password, 10)
@@ -53,5 +53,5 @@ export const newPassword = async (
     where: { id: existingToken.id },
   })
 
-  return { success: "Password updated"}
+  return { success: 'Password updated' }
 }

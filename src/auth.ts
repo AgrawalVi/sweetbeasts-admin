@@ -1,14 +1,14 @@
-import NextAuth, { type DefaultSession } from "next-auth"
-import { JWT } from "next-auth/jwt"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { db } from "@/lib/db"
-import { UserRole } from "@prisma/client"
-import authConfig from "@/auth.config"
+import NextAuth, { type DefaultSession } from 'next-auth'
+import { JWT } from 'next-auth/jwt'
+import { PrismaAdapter } from '@auth/prisma-adapter'
+import { db } from '@/lib/db'
+import { UserRole } from '@prisma/client'
+import authConfig from '@/auth.config'
 
-import { getUserById } from "@/data/auth/user"
-import { getTwoFactorConfirmationByUserId } from "@/data/auth/two-factor-confirmation"
+import { getUserById } from '@/data/auth/user'
+import { getTwoFactorConfirmationByUserId } from '@/data/auth/two-factor-confirmation'
 
-declare module "next-auth" {
+declare module 'next-auth' {
   /**
    * Add any extra fields to the session that are not part of the default session
    */
@@ -16,11 +16,11 @@ declare module "next-auth" {
     user: {
       role: UserRole
       isTwoFactorEnabled: boolean
-    } & DefaultSession["user"]
+    } & DefaultSession['user']
   }
 }
 
-declare module "next-auth/jwt" {
+declare module 'next-auth/jwt' {
   interface JWT {
     role?: UserRole
     isTwoFactorEnabled: boolean
@@ -29,8 +29,8 @@ declare module "next-auth/jwt" {
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
-    signIn: "/auth/login",
-    error: "/auth/error",
+    signIn: '/auth/login',
+    error: '/auth/error',
   },
 
   events: {
@@ -45,7 +45,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async signIn({ user, account }) {
       // allow 0Auth without email verification
-      if (account?.provider !== "credentials") {
+      if (account?.provider !== 'credentials') {
         return true
       }
 
@@ -62,7 +62,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       if (existingUser.isTwoFactorEnabled) {
         const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
-          existingUser.id
+          existingUser.id,
         )
 
         if (!twoFactorConfirmation) {
@@ -106,6 +106,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
   adapter: PrismaAdapter(db),
-  session: { strategy: "jwt" },
+  session: { strategy: 'jwt' },
   ...authConfig,
 })

@@ -1,17 +1,17 @@
-"use client"
+'use client'
 
-import Link from "next/link"
-import { CircleUser, Menu, Package2, Search } from "lucide-react"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import ThemeSwitcher from "@/components/ui/theme-switcher"
-import { useState } from "react"
-import { signOut } from "@/auth"
-import LogoutButton from "../auth/logout-button"
-import UserButton from "./user-button"
+import Link from 'next/link'
+import { CircleUser, Menu, Package2, Search } from 'lucide-react'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { usePathname } from 'next/navigation'
+import { cn } from '@/lib/utils'
+import ThemeSwitcher from '@/components/ui/theme-switcher'
+import { useState } from 'react'
+import { signOut } from '@/auth'
+import LogoutButton from '../auth/logout-button'
+import UserButton from './user-button'
 
 export default function Header() {
   const pathname = usePathname()
@@ -19,41 +19,41 @@ export default function Header() {
 
   const navItems = [
     {
-      name: "Dashboard",
-      path: "/dashboard",
+      name: 'Dashboard',
+      path: '/dashboard',
     },
     {
-      name: "Orders",
-      path: "/dashboard/orders",
+      name: 'Orders',
+      path: '/dashboard/orders',
     },
     {
-      name: "Products",
-      path: "/dashboard/products",
+      name: 'Products',
+      path: '/dashboard/products',
     },
     {
-      name: "Customers",
-      path: "/dashboard/customers",
+      name: 'Customers',
+      path: '/dashboard/customers',
     },
     {
-      name: "Analytics",
-      path: "/dashboard/analytics",
+      name: 'Analytics',
+      path: '/dashboard/analytics',
     },
     {
-      name: "Settings",
-      path: "/dashboard/settings",
+      name: 'Settings',
+      path: '/dashboard/settings',
     },
   ]
 
   return (
-    <div className="sticky top-0 flex h-16 lg:h-20 items-center gap-4 border-b bg-background px-4 md:px-6">
+    <div className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 lg:h-20">
       <nav
         className={cn(
-          "hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6"
+          'hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6',
         )}
       >
         <Link
           href="/home"
-          className="flex items-center gap-2 lg:text-lg font-semibold md:text-base"
+          className="flex items-center gap-2 font-semibold md:text-base lg:text-lg"
         >
           <Package2 className="h-6 w-6" />
         </Link>
@@ -62,10 +62,10 @@ export default function Header() {
             href={item.path}
             key={i}
             className={cn(
-              "transition-colors lg:text-lg hover:text-foreground",
+              'transition-colors hover:text-foreground lg:text-lg',
               item.path === pathname
-                ? "text-foreground"
-                : "text-muted-foreground"
+                ? 'text-foreground'
+                : 'text-muted-foreground',
             )}
           >
             {item.name}
@@ -94,10 +94,10 @@ export default function Header() {
                   <Link
                     href={item.path}
                     className={cn(
-                      "transition-colors lg:text-lg hover:text-foreground",
+                      'transition-colors hover:text-foreground lg:text-lg',
                       item.path === pathname
-                        ? "text-foreground"
-                        : "text-muted-foreground"
+                        ? 'text-foreground'
+                        : 'text-muted-foreground',
                     )}
                   >
                     {item.name}

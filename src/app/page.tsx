@@ -1,6 +1,6 @@
-import Image from "next/image";
-import { LoginButton } from "@/components/auth/login-button";
-import { Button } from "@/components/ui/button";
+import Image from 'next/image'
+import { LoginButton } from '@/components/auth/login-button'
+import { Button } from '@/components/ui/button'
 
 export default function Home() {
   return (
@@ -12,13 +12,18 @@ export default function Home() {
         <h1 className="text-6xl font-semibold text-white drop-shadow-lg">
           SweetBeasts Admin
         </h1>
-        <p className="text-white text-2xl drop-shadow-lg font-semibold">If you have an admin account, please login
-          below
+        <p className="text-2xl font-semibold text-white drop-shadow-lg">
+          If you have an admin account, please login below
         </p>
         <LoginButton>
-          <Button size="lg" className="text-black bg-white mt-5 hover:bg-white/80 text-lg">Sign in</Button>
+          <Button
+            size="lg"
+            className="mt-5 bg-white text-lg text-black hover:bg-white/80"
+          >
+            Sign in
+          </Button>
         </LoginButton>
       </div>
     </main>
-  );
+  )
 }

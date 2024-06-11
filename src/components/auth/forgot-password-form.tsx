@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { Input } from "@/components/ui/input"
-import { useState, useTransition } from "react"
-import { CardWrapper } from "@/components/auth/card-wrapper"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { Input } from '@/components/ui/input'
+import { useState, useTransition } from 'react'
+import { CardWrapper } from '@/components/auth/card-wrapper'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Form,
   FormControl,
@@ -12,30 +12,29 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from '@/components/ui/form'
 
-import * as z from "zod"
-import { ResetPasswordSchema } from "@/schemas"
-import { Button } from "@/components/ui/button"
-import { FormError } from "@/components/general/form-error"
-import { FormSuccess } from "@/components/general/form-success"
-import { resetPassword } from "@/actions/auth/resetPassword"
-
+import * as z from 'zod'
+import { ResetPasswordSchema } from '@/schemas'
+import { Button } from '@/components/ui/button'
+import { FormError } from '@/components/general/form-error'
+import { FormSuccess } from '@/components/general/form-success'
+import { resetPassword } from '@/actions/auth/resetPassword'
 
 export const ForgotPasswordForm = ({}) => {
   const [isPending, startTransition] = useTransition()
-  const [error, setError] = useState<string | undefined>("")
-  const [success, setSuccess] = useState<string | undefined>("")
+  const [error, setError] = useState<string | undefined>('')
+  const [success, setSuccess] = useState<string | undefined>('')
 
   const form = useForm<z.infer<typeof ResetPasswordSchema>>({
     resolver: zodResolver(ResetPasswordSchema),
     defaultValues: {
-      email: "",
+      email: '',
     },
   })
 
   const onSubmit = (values: z.infer<typeof ResetPasswordSchema>) => {
-    setError("")
+    setError('')
 
     startTransition(() => {
       resetPassword(values).then((data) => {

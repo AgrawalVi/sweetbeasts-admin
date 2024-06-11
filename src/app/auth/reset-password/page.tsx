@@ -1,9 +1,7 @@
-import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
+import { ForgotPasswordForm } from '@/components/auth/forgot-password-form'
 
 const ForgotPassword = () => {
-    return (
-        <ForgotPasswordForm />
-    );
+  return <ForgotPasswordForm />
 }
 
-export default ForgotPassword;
+export default ForgotPassword

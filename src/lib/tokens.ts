@@ -1,11 +1,11 @@
-import crypto from "crypto"
-import { v4 as uuidv4 } from "uuid"
+import crypto from 'crypto'
+import { v4 as uuidv4 } from 'uuid'
 
-import { db } from "@/lib/db"
+import { db } from '@/lib/db'
 
-import { getVerificationTokenByEmail } from "@/data/auth/verification-token"
-import { getResetPasswordTokenByEmail } from "@/data/auth/reset-password-token"
-import { getTwoFactorTokenByEmail } from "@/data/auth/two-factor-token"
+import { getVerificationTokenByEmail } from '@/data/auth/verification-token'
+import { getResetPasswordTokenByEmail } from '@/data/auth/reset-password-token'
+import { getTwoFactorTokenByEmail } from '@/data/auth/two-factor-token'
 
 export const generateTwoFactorToken = async (email: string) => {
   const token = crypto.randomInt(100_000, 1_000_000).toString()
@@ -16,7 +16,7 @@ export const generateTwoFactorToken = async (email: string) => {
 
   if (existingToken) {
     await db.twoFactorToken.delete({
-      where: { id: existingToken.id }
+      where: { id: existingToken.id },
     })
   }
 
@@ -24,8 +24,8 @@ export const generateTwoFactorToken = async (email: string) => {
     data: {
       email,
       token,
-      expires
-    }
+      expires,
+    },
   })
 
   return twoFactorToken
@@ -49,8 +49,8 @@ export async function generateVerificationToken(email: string) {
     data: {
       email,
       token,
-      expires
-    }
+      expires,
+    },
   })
 
   return verificationToken
@@ -64,7 +64,7 @@ export const generateResetPasswordToken = async (email: string) => {
 
   if (existingToken) {
     await db.resetPasswordToken.delete({
-      where: { id: existingToken.id}
+      where: { id: existingToken.id },
     })
   }
 
@@ -72,9 +72,9 @@ export const generateResetPasswordToken = async (email: string) => {
     data: {
       email,
       token,
-      expires
-    }
+      expires,
+    },
   })
 
-  return resetPasswordToken;
+  return resetPasswordToken
 }
