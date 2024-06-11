@@ -1,8 +1,7 @@
+import { currentUser } from "@/lib/auth"
 
-export default function Orders() {
-  return (
-    <div>
-      Orders
-    </div>
-  )
+export default async function Orders() {
+  const user = await currentUser()
+
+  return <div>{JSON.stringify(user)}</div>
 }
