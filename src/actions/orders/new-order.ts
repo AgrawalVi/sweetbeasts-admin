@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import Stripe from "stripe";
 
-export const createOrder = async (event: Stripe.CheckoutSessionCompletedEvent) {
+export const createOrder = async (event: Stripe.CheckoutSessionCompletedEvent) => {
   const checkoutSession = event.data.object;
 
   // get order information from event
