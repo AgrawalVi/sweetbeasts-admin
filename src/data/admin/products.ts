@@ -1,11 +1,11 @@
-import { db } from "@/lib/db";
+import { db } from '@/lib/db'
 
-export async function getProductByName(name : string) {
+export async function getProductByName(name: string) {
   try {
     const product = await db.product.findFirst({
       where: {
-        name: name
-      }
+        name: name,
+      },
     })
     return product
   } catch {
@@ -13,14 +13,23 @@ export async function getProductByName(name : string) {
   }
 }
 
-export async function getProductById (id : number) {
+export async function getProductById(id: number) {
   try {
     const product = await db.product.findUnique({
       where: {
-        id
-      }
+        id,
+      },
     })
     return product
+  } catch {
+    return null
+  }
+}
+
+export async function getAllProducts() {
+  try {
+    const products = await db.product.findMany()
+    return products
   } catch {
     return null
   }

@@ -116,6 +116,7 @@ model Product {
   priceInCents     Int
   description      String
   stripeProductId  String   @unique
+  stripePriceId    String   @unique
   primaryImagePath String?
   numSold          Int      @default(0)
   dateCreated      DateTime @default(now())

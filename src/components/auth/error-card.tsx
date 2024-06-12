@@ -1,5 +1,5 @@
-import { CardWrapper } from "@/components/auth/card-wrapper"
-import { TriangleAlert } from "lucide-react"
+import { CardWrapper } from '@/components/auth/card-wrapper'
+import { TriangleAlert } from 'lucide-react'
 
 export const ErrorCard = () => {
   return (
@@ -8,9 +8,9 @@ export const ErrorCard = () => {
       backButtonHref="/auth/login"
       backButtonLabel="Back to login"
     >
-        <div className="w-full items-center flex justify-center">
-            <TriangleAlert className="text-destructive"></TriangleAlert>
-        </div>
+      <div className="flex w-full items-center justify-center">
+        <TriangleAlert className="text-destructive"></TriangleAlert>
+      </div>
     </CardWrapper>
   )
 }

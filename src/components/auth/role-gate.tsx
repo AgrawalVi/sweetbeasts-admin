@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { useCurrentRole } from "@/hooks/use-current-role"
-import { UserRole } from "@prisma/client"
+import { useCurrentRole } from '@/hooks/use-current-role'
+import { UserRole } from '@prisma/client'
 
 interface RoleGateProps {
   children: React.ReactNode
