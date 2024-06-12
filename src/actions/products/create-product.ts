@@ -29,7 +29,8 @@ export const createProduct = async (
     return { error: 'Invalid fields' }
   }
 
-  const { name, quantity, priceInCents, description } = validatedFields.data
+  const { name, quantity, priceInCents, description, available } =
+    validatedFields.data
 
   const existingProduct = await getProductByName(name)
 
@@ -42,6 +43,7 @@ export const createProduct = async (
     stripeProduct = await stripe.products.create({
       name,
       description,
+      active: available === 'true' ? true : false,
       shippable: true,
       url: `https://sweetbeasts.shop/products/${name}`,
       default_price_data: {
@@ -64,6 +66,7 @@ export const createProduct = async (
           inventory: quantity,
           stripeProductId: stripeProduct.id,
           stripePriceId: stripeProduct.default_price as string,
+          available: available === 'true' ? true : false,
         },
       })
     } catch (e) {

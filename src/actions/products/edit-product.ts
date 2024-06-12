@@ -28,7 +28,8 @@ export const editProduct = async (
     return { error: 'Invalid fields' }
   }
 
-  const { name, quantity, priceInCents, description } = validatedFields.data
+  const { name, quantity, priceInCents, description, available } =
+    validatedFields.data
 
   // verify that the product exists
   const existingProduct = await getProductById(productId)
@@ -58,6 +59,7 @@ export const editProduct = async (
     await stripe.products.update(existingProduct.stripeProductId, {
       name,
       description,
+      active: available === 'true' ? true : false,
     })
   } catch {
     return { error: 'Failed to update product in stripe' }
@@ -74,6 +76,7 @@ export const editProduct = async (
         inventory: quantity,
         priceInCents,
         description,
+        available: available === 'true' ? true : false,
       },
     })
   } catch {
