@@ -120,7 +120,7 @@ model Product {
   primaryImagePath String?
   numSold          Int      @default(0)
   dateCreated      DateTime @default(now())
-  inventory        Int      @default(0)
+  inventory        Int
   available        Boolean  @default(true)
 
   cartItems CartItem[]

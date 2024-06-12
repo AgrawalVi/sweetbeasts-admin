@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import * as React from "react"
+import * as React from 'react'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,11 +12,11 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+} from '@tanstack/react-table'
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react'
 
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -25,8 +25,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -34,47 +34,24 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from '@/components/ui/table'
+
+import { Product } from '@prisma/client'
+import { getAllProducts } from '@/actions/products/get-product'
+
+import { useQuery } from '@tanstack/react-query'
 
 // Update data structure to reflect the new columns
-const data: Product[] = [
-  {
-    id: "1",
-    name: "Product A",
-    price: 100,
-    quantity: 50,
-    available: true,
-    ordered: 30,
-  },
-  {
-    id: "2",
-    name: "Product B",
-    price: 150,
-    quantity: 20,
-    available: false,
-    ordered: 5,
-  },
-  // Add more data as needed
-]
-
-export type Product = {
-  id: string
-  name: string
-  price: number
-  quantity: number
-  available: boolean
-  ordered: number
-}
 
 // Update columns to match the new data structure
 export const columns: ColumnDef<Product>[] = [
   {
-    id: "select",
+    id: 'select',
     header: ({ table }) => (
       <Checkbox
         checked={
           table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
+          (table.getIsSomePageRowsSelected() && 'indeterminate')
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
@@ -91,52 +68,50 @@ export const columns: ColumnDef<Product>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "name",
+    accessorKey: 'name',
     header: ({ column }) => (
       <Button
         variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
         Product Name
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+    cell: ({ row }) => <div className="capitalize">{row.getValue('name')}</div>,
   },
   {
-    accessorKey: "price",
+    accessorKey: 'price',
     header: () => <div className="text-right">Product Price</div>,
     cell: ({ row }) => {
-      const price = parseFloat(row.getValue("price"))
+      const price = parseFloat(row.getValue('price'))
 
       // Format the price as a dollar amount
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
+      const formatted = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
       }).format(price)
 
       return <div className="text-right font-medium">{formatted}</div>
     },
   },
   {
-    accessorKey: "quantity",
-    header: "Product Quantity",
-    cell: ({ row }) => <div>{row.getValue("quantity")}</div>,
+    accessorKey: 'quantity',
+    header: 'Product Quantity',
+    cell: ({ row }) => <div>{row.getValue('quantity')}</div>,
   },
   {
-    accessorKey: "available",
-    header: "Available",
-    cell: ({ row }) => (
-      <div>{row.getValue("available") ? "Yes" : "No"}</div>
-    ),
+    accessorKey: 'available',
+    header: 'Available',
+    cell: ({ row }) => <div>{row.getValue('available') ? 'Yes' : 'No'}</div>,
   },
   {
-    accessorKey: "ordered",
-    header: "Number Ordered",
-    cell: ({ row }) => <div>{row.getValue("ordered")}</div>,
+    accessorKey: 'ordered',
+    header: 'Number Ordered',
+    cell: ({ row }) => <div>{row.getValue('ordered')}</div>,
   },
   {
-    id: "actions",
+    id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
       const product = row.original
@@ -166,9 +141,20 @@ export const columns: ColumnDef<Product>[] = [
 ]
 
 export default function DataTableDemo() {
+  const { data, isError, isPending } = useQuery({
+    queryKey: ['all-products'],
+    queryFn: async () => {
+      const response = await getAllProducts()
+      if (response.success) {
+        return response.success
+      }
+      throw new Error(response.error)
+    },
+  })
+
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   )
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
@@ -193,14 +179,22 @@ export default function DataTableDemo() {
     },
   })
 
+  if (isPending) {
+    return <div>Loading...</div>
+  }
+
+  if (isError) {
+    return <div>An unknown error has occurred</div>
+  }
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter products..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
           onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
+            table.getColumn('name')?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -243,7 +237,7 @@ export default function DataTableDemo() {
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   )
@@ -256,13 +250,13 @@ export default function DataTableDemo() {
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() && 'selected'}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -283,7 +277,7 @@ export default function DataTableDemo() {
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredSelectedRowModel().rows.length} of{' '}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className="space-x-2">
