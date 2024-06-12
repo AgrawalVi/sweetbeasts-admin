@@ -6,6 +6,7 @@ import { db } from '@/lib/db'
 import { CreateProductSchema } from '@/schemas'
 import { getProductById } from '@/data/admin/products'
 import { currentRole } from '@/lib/auth'
+import { UserRole } from '@prisma/client'
 
 export const editProduct = async (
   values: z.infer<typeof CreateProductSchema>,
@@ -13,10 +14,11 @@ export const editProduct = async (
 ) => {
   // THIS IS AN ADMIN ONLY ACTION
   const role = await currentRole()
-  if (role !== 'ADMIN') {
+
+  if (role !== UserRole.ADMIN) {
     return {
       error:
-        'You are not authorized to edit a product. Please contact an admin for the necessary permissions.',
+        'You are not authorized to create a product. Please contact an admin for the necessary permissions.',
     }
   }
   // verify that the fields are valid
