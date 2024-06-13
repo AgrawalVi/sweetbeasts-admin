@@ -6,10 +6,22 @@ import { db } from '@/lib/db'
 import { stripe } from '@/lib/stripe'
 import { CreateProductSchema } from '@/schemas'
 import { getProductByName } from '@/data/admin/products'
+import { currentRole } from '@/lib/auth'
+import { UserRole } from '@prisma/client'
 
 export const createProduct = async (
   values: z.infer<typeof CreateProductSchema>,
 ) => {
+  // THIS IS AN ADMIN ONLY ACTION
+  const role = await currentRole()
+
+  if (role !== UserRole.ADMIN) {
+    return {
+      error:
+        'You are not authorized to create a product. Please contact an admin for the necessary permissions.',
+    }
+  }
+
   console.log(values)
   const validatedFields = CreateProductSchema.safeParse(values)
 
@@ -17,7 +29,8 @@ export const createProduct = async (
     return { error: 'Invalid fields' }
   }
 
-  const { name, quantity, priceInCents, description } = validatedFields.data
+  const { name, quantity, priceInCents, description, available } =
+    validatedFields.data
 
   const existingProduct = await getProductByName(name)
 
@@ -30,6 +43,7 @@ export const createProduct = async (
     stripeProduct = await stripe.products.create({
       name,
       description,
+      active: available === 'true' ? true : false,
       shippable: true,
       url: `https://sweetbeasts.shop/products/${name}`,
       default_price_data: {
@@ -52,6 +66,7 @@ export const createProduct = async (
           inventory: quantity,
           stripeProductId: stripeProduct.id,
           stripePriceId: stripeProduct.default_price as string,
+          available: available === 'true' ? true : false,
         },
       })
     } catch (e) {

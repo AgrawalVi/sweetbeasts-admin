@@ -25,3 +25,12 @@ export async function getProductById(id: number) {
     return null
   }
 }
+
+export async function getAllProducts() {
+  try {
+    const products = await db.product.findMany()
+    return products
+  } catch {
+    return null
+  }
+}

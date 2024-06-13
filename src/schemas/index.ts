@@ -86,6 +86,17 @@ export const CreateProductSchema = z.object({
   description: z.string().min(1, {
     message: 'Description is required',
   }),
-  priceInCents: z.coerce.number(),
-  quantity: z.coerce.number(),
+  priceInCents: z.coerce
+    .number({
+      message: 'Price must be a number',
+    })
+    .gte(99, {
+      message: 'Price has to be greater than $0.99',
+    }),
+  quantity: z.coerce.number({
+    message: 'Quantity must be a number',
+  }),
+  available: z.enum(['true', 'false'], {
+    message: 'Available must be a boolean',
+  }),
 })

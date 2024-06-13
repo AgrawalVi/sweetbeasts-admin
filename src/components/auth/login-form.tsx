@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -42,6 +42,8 @@ export const LoginForm = ({}) => {
   const [error, setError] = useState<string | undefined>('')
   const [success, setSuccess] = useState<string | undefined>('')
 
+  const submitButtonRef = useRef<HTMLButtonElement>(null)
+
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -58,6 +60,10 @@ export const LoginForm = ({}) => {
       login(values)
         .then((data) => {
           if (data?.error) {
+            if (showTwoFactor) {
+              setError(data.error)
+              return
+            }
             form.reset()
             setError(data.error)
           }
@@ -101,6 +107,7 @@ export const LoginForm = ({}) => {
                           maxLength={6}
                           {...field}
                           pattern={REGEXP_ONLY_DIGITS}
+                          onComplete={() => submitButtonRef.current?.click()}
                         >
                           <InputOTPGroup>
                             <InputOTPSlot index={0} />
@@ -172,7 +179,7 @@ export const LoginForm = ({}) => {
           </div>
           <FormError message={error || urlError} />
           <FormSuccess message={success} />
-          <Button type="submit" className="w-full" disabled={isPending}>
+          <Button type="submit" className="w-full" disabled={isPending} ref={submitButtonRef}>
             {showTwoFactor ? 'Confirm' : 'Login'}
           </Button>
         </form>
