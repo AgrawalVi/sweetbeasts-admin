@@ -104,7 +104,7 @@ model CartItem {
   productId Int
 
   user    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Product Product? @relation(fields: [productId], references: [id])
+  Product Product? @relation(fields: [productId], references: [id], onDelete:Cascade)
 
   @@unique([userId, productId]) // user can only have 1 product active at a time
   @@unique([guestId, productId]) // guest can only have 1 product active at a time
