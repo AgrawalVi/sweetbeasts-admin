@@ -1,19 +1,11 @@
 'use server'
 
-import * as z from 'zod'
 import { db } from '@/lib/db'
 import { currentRole } from '@/lib/auth'
 import { UserRole } from '@prisma/client'
 import { getProductByName } from '@/data/admin/products'
 
-// Define the schema for product deletion
-const DeleteProductSchema = z.object({
-  name: z.string(),
-})
-
-export const deleteProduct = async (
-  values: z.infer<typeof DeleteProductSchema>,
-) => {
+export const deleteProduct = async (name: string) => {
   // THIS IS AN ADMIN ONLY ACTION
   const role = await currentRole()
 
@@ -24,14 +16,7 @@ export const deleteProduct = async (
     }
   }
 
-  console.log(values)
-  const validatedFields = DeleteProductSchema.safeParse(values)
-
-  if (!validatedFields.success) {
-    return { error: 'Invalid fields' }
-  }
-
-  const { name } = validatedFields.data
+  console.log(name)
 
   const existingProduct = await getProductByName(name)
 
@@ -47,7 +32,7 @@ export const deleteProduct = async (
       })
       // Delete the product
       await prisma.product.delete({
-        where: { name },
+        where: { id: existingProduct.id },
       })
     })
   } catch (e) {
