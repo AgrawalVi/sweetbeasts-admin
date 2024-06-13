@@ -1,9 +1,11 @@
 'use server'
 
-import { getAllProducts as getAllProductsDb } from '@/data/admin/products'
+import {
+  getAllProducts as getAllProductsDb,
+  getProductById as getProductByIdDb,
+} from '@/data/admin/products'
 import { currentRole } from '@/lib/auth'
 import { UserRole } from '@prisma/client'
-import { getProductById as getProductByIdDb } from '@/data/admin/products'
 
 export const getAllProducts = async () => {
   // THIS IS AN ADMIN ONLY ACTION
@@ -23,13 +25,12 @@ export const getAllProducts = async () => {
     }
     console.log('products', products)
     return { success: products }
-  } catch {
-    return { error: 'Error getting products' }
+  } catch (e) {
+    return { error: 'Error: ' + e }
   }
 }
 
-
-export const getProductById = async (id:number) => {
+export const getProductById = async (id: number) => {
   // THIS IS AN ADMIN ONLY ACTION
   const role = await currentRole()
 
@@ -41,13 +42,13 @@ export const getProductById = async (id:number) => {
   }
 
   try {
-    const products = await getProductByIdDb(id)
-    if (!products) {
-      return { error: 'No products found' }
+    const product = await getProductByIdDb(id)
+    if (!product) {
+      return { error: 'No product found' }
     }
-    console.log('products', products)
-    return { success: products }
-  } catch {
-    return { error: 'Error getting products' }
+    console.log('product', product)
+    return { success: product }
+  } catch (e) {
+    return { error: 'Error: ' + e }
   }
 }
