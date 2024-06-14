@@ -160,9 +160,10 @@ model Order {
 }
 
 model lineItem {
-  id     Int     @id @default(autoincrement())
-  userId String?
-  email  String
+  id                  Int     @id @default(autoincrement())
+  userId              String?
+  email               String
+  pricePerUnitInCents Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
