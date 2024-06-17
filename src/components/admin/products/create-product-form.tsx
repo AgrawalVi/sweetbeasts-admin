@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -28,13 +28,21 @@ import { useToast } from '@/components/ui/use-toast'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
+const defaultValues = {
+  name: '',
+  description: '',
+  priceInCents: 0,
+  quantity: 0,
+  available: 'true' as 'true' | 'false',
+}
+
 interface CreateProductFormProps {
-  setInfoInForm: (value: boolean) => void
+  setIsChanged: (value: boolean) => void
   setOpen: (value: boolean) => void
 }
 
 export default function CreateProductForm({
-  setInfoInForm,
+  setIsChanged,
   setOpen,
 }: CreateProductFormProps) {
   const { toast } = useToast()
@@ -49,6 +57,17 @@ export default function CreateProductForm({
       available: 'true',
     },
   })
+
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      console.log(JSON.stringify(value))
+      console.log(JSON.stringify(defaultValues))
+      const hasChanged = JSON.stringify(value) !== JSON.stringify(defaultValues)
+      setIsChanged(hasChanged)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [form, setIsChanged])
 
   async function onSubmit(values: z.infer<typeof CreateProductSchema>) {
     let result = await createProduct(values)

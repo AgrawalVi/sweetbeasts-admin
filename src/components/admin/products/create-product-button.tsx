@@ -13,11 +13,15 @@ import { useState } from 'react'
 const CreateProductButton = () => {
   const [mainOpen, setMainOpen] = useState<boolean>(false)
   const [confirmExitOpen, setConfirmExitOpen] = useState<boolean>(false)
-  const [infoInForm, setInfoInForm] = useState<boolean>(false)
+  const [isChanged, setIsChanged] = useState<boolean>(false)
 
   const onExit = (event: any) => {
     event.preventDefault() // prevent the default form closure
-    setConfirmExitOpen(true)
+    if (isChanged) {
+      setConfirmExitOpen(true)
+    } else {
+      setMainOpen(false)
+    }
   }
 
   return (
@@ -31,7 +35,10 @@ const CreateProductButton = () => {
           <DialogDescription>
             Fill out the form to add a product
           </DialogDescription>
-          <CreateProductForm setInfoInForm={setInfoInForm} setOpen={setMainOpen} />
+          <CreateProductForm
+            setIsChanged={setIsChanged}
+            setOpen={setMainOpen}
+          />
         </DialogContent>
       </Dialog>
 
