@@ -33,7 +33,7 @@ const defaultValues = {
   description: '',
   priceInCents: 0,
   quantity: 0,
-  available: 'true' as 'true' | 'false',
+  available: 'false' as 'true' | 'false',
 }
 
 interface CreateProductFormProps {
@@ -46,6 +46,7 @@ export default function CreateProductForm({
   setOpen,
 }: CreateProductFormProps) {
   const { toast } = useToast()
+  const queryClient = useQueryClient()
 
   const form = useForm<z.infer<typeof CreateProductSchema>>({
     resolver: zodResolver(CreateProductSchema),
@@ -54,7 +55,7 @@ export default function CreateProductForm({
       description: '',
       priceInCents: 0,
       quantity: 0,
-      available: 'true',
+      available: 'false',
     },
   })
 
@@ -70,23 +71,33 @@ export default function CreateProductForm({
   }, [form, setIsChanged])
 
   async function onSubmit(values: z.infer<typeof CreateProductSchema>) {
-    let result = await createProduct(values)
+    mutation.mutate(values)
+  }
 
-    if (result.success) {
+  const mutation = useMutation({
+    mutationFn: async (values: z.infer<typeof CreateProductSchema>) => {
+      const result = await createProduct(values)
+      if (result.error) {
+        throw new Error(result.error)
+      }
+      return values
+    },
+    onSuccess: (data) => {
       toast({
         title: 'Product added',
-        description: `${values.name} added successfully`,
+        description: `${data.name} added successfully`,
       })
       setOpen(false)
-    }
-    if (result.error) {
+      queryClient.invalidateQueries({ queryKey: ['all-products'] })
+    },
+    onError: (error) => {
       toast({
         title: 'An error has occurred',
-        description: result.error,
+        description: error.message,
         variant: 'destructive',
       })
-    }
-  }
+    },
+  })
 
   return (
     <Form {...form}>
@@ -180,7 +191,9 @@ export default function CreateProductForm({
           />
         </div>
         {/* <FormField */}
-        <Button type="submit">Add Product</Button>
+        <Button type="submit" disabled={mutation.isPending}>
+          Add Product
+        </Button>
       </form>
     </Form>
   )
