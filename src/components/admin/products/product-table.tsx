@@ -94,9 +94,9 @@ export const columns: ColumnDef<Product>[] = [
     },
   },
   {
-    accessorKey: 'quantity',
+    accessorKey: 'inventory',
     header: 'Product Quantity',
-    cell: ({ row }) => <div>{row.getValue('quantity')}</div>,
+    cell: ({ row }) => <div>{row.getValue('inventory')}</div>,
   },
   {
     accessorKey: 'available',
@@ -104,9 +104,9 @@ export const columns: ColumnDef<Product>[] = [
     cell: ({ row }) => <div>{row.getValue('available') ? 'Yes' : 'No'}</div>,
   },
   {
-    accessorKey: 'ordered',
+    accessorKey: 'numSold',
     header: 'Number Ordered',
-    cell: ({ row }) => <div>{row.getValue('ordered')}</div>,
+    cell: ({ row }) => <div>{row.getValue('numSold')}</div>,
   },
   {
     id: 'actions',
@@ -159,7 +159,7 @@ export default function ProductTable() {
   const [rowSelection, setRowSelection] = React.useState({})
 
   const table = useReactTable({
-    data,
+    data: data ? data : [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
