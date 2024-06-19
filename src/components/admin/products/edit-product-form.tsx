@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { createProduct } from '@/actions/products/create-product'
-
+import { editProduct } from '@/actions/products/edit-product'
 import { CreateProductSchema } from '@/schemas'
 
 import {
@@ -28,25 +28,58 @@ import { useToast } from '@/components/ui/use-toast'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import Products from '@/app/dashboard/products/page'
+import { getProductById } from '@/actions/products/get-product'
+import { Product } from '@prisma/client'
+import result from 'postcss/lib/result'
 
 interface EditProductFormProps{productId:number} {
     // productId:number
 }
 
 export default function EditProductForm({
-
+  
 }: EditProductFormProps) {
+  console.log('called editproductform')
   const { toast } = useToast()
+  const productId = 2;
+  const [product, setProduct] = React.useState<Product  | null>(null);
 
+  useEffect(() => {
+    getProductById(productId).then((result) => {
+      if (result.success) {
+        toast({
+          title: 'Product fetched',
+          description: `Product fetched successfully`,
+        })
+        setProduct(result.success)
+  
+      }
+      if (result.error) {
+        toast({
+          title: 'An error has occurred',
+          description: result.error,
+          variant: 'destructive',
+        })
+      }
+    })}, [productId]
+  )
+// 
   const form = useForm<z.infer<typeof CreateProductSchema>>({
     resolver: zodResolver(CreateProductSchema),
     defaultValues: {
-      name: '',
-      description: '',
-      priceInCents: 0,
-      quantity: 0,
-      available: 'true',
+      name: product?.name,
+      description: product?.description,
+      priceInCents: product?.priceInCents,
+      quantity: product?.inventory,
+      available: product?.available ? 'true' : 'false',
     },
+    values: {
+      name: product!.name,
+      description: product!.description,
+      priceInCents: product!.priceInCents,
+      quantity: product!.inventory,
+      available: product!.available ? 'true' : 'false',
+    }
   })
 
   async function onSubmit(values: z.infer<typeof CreateProductSchema>) {
