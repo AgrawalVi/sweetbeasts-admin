@@ -32,17 +32,13 @@ import { getProductById } from '@/actions/products/get-product'
 import { Product } from '@prisma/client'
 import result from 'postcss/lib/result'
 
-interface EditProductFormProps{productId:number} {
-    // productId:number
-}
+interface EditProductFormProps {}
 
-export default function EditProductForm({
-  
-}: EditProductFormProps) {
+export default function EditProductForm({}: EditProductFormProps) {
   console.log('called editproductform')
   const { toast } = useToast()
-  const productId = 2;
-  const [product, setProduct] = React.useState<Product  | null>(null);
+  const productId = 2
+  const [product, setProduct] = React.useState<Product | null>(null)
 
   useEffect(() => {
     getProductById(productId).then((result) => {
@@ -52,7 +48,6 @@ export default function EditProductForm({
           description: `Product fetched successfully`,
         })
         setProduct(result.success)
-  
       }
       if (result.error) {
         toast({
@@ -61,9 +56,9 @@ export default function EditProductForm({
           variant: 'destructive',
         })
       }
-    })}, [productId]
-  )
-// 
+    })
+  }, [productId])
+  //
   const form = useForm<z.infer<typeof CreateProductSchema>>({
     resolver: zodResolver(CreateProductSchema),
     defaultValues: {
@@ -79,7 +74,7 @@ export default function EditProductForm({
       priceInCents: product!.priceInCents,
       quantity: product!.inventory,
       available: product!.available ? 'true' : 'false',
-    }
+    },
   })
 
   async function onSubmit(values: z.infer<typeof CreateProductSchema>) {
@@ -90,7 +85,6 @@ export default function EditProductForm({
         title: 'Product added',
         description: `${values.name} added successfully`,
       })
-
     }
     if (result.error) {
       toast({
