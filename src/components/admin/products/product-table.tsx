@@ -36,6 +36,7 @@ import {
 
 import { Product } from '@prisma/client'
 import { getAllProducts } from '@/actions/products/get-product'
+import EditProductButton from './edit-product-button'
 
 import { useQuery } from '@tanstack/react-query'
 
@@ -112,32 +113,37 @@ export const columns: ColumnDef<Product>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const product = row.original
-
+      const product = row.original;
+  
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() =>
-                navigator.clipboard.writeText(product.id.toString())
-              }
-            >
-              Copy Product ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View product details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
+        <div className="flex items-center">
+          <EditProductButton product={product} />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0 ml-2">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() =>
+                  navigator.clipboard.writeText(product.id.toString())
+                }
+              >
+                Copy Product ID
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>View product details</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      );
     },
-  },
+  }
+  
+  
 ]
 
 export default function ProductTable() {

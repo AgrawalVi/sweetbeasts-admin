@@ -1,3 +1,4 @@
+import { Product } from '@prisma/client'
 import {
   Dialog,
   DialogContent,
@@ -7,10 +8,13 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import EditProductForm from './edit-product-form'
-
 import { useState } from 'react'
 
-const EditProductButton = () => {
+interface EditProductButtonProps {
+  product: Product
+}
+
+const EditProductButton: React.FC<EditProductButtonProps> = ({ product }) => {
   const [mainOpen, setMainOpen] = useState<boolean>(false)
   const [confirmExitOpen, setConfirmExitOpen] = useState<boolean>(false)
   const [infoInForm, setInfoInForm] = useState<boolean>(false)
@@ -27,11 +31,11 @@ const EditProductButton = () => {
           <Button>Edit Product</Button>
         </DialogTrigger>
         <DialogContent onEscapeKeyDown={onExit} onInteractOutside={onExit}>
-          <DialogHeader>Add Product</DialogHeader>
+          <DialogHeader>Edit Product</DialogHeader>
           <DialogDescription>
-            Fill out the form to add a product
+            Fill out the form to edit the product
           </DialogDescription>
-          <EditProductForm productId={1} />
+          <EditProductForm product={product} />
         </DialogContent>
       </Dialog>
 
