@@ -19,51 +19,6 @@ import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 import { Product } from '@prisma/client'
 
-<<<<<<< HEAD
-interface EditProductFormProps {}
-
-export default function EditProductForm({}: EditProductFormProps) {
-  console.log('called editproductform')
-  const { toast } = useToast()
-  const productId = 2
-  const [product, setProduct] = React.useState<Product | null>(null)
-
-  useEffect(() => {
-    getProductById(productId).then((result) => {
-      if (result.success) {
-        toast({
-          title: 'Product fetched',
-          description: `Product fetched successfully`,
-        })
-        setProduct(result.success)
-      }
-      if (result.error) {
-        toast({
-          title: 'An error has occurred',
-          description: result.error,
-          variant: 'destructive',
-        })
-      }
-    })
-  }, [productId])
-  //
-  const form = useForm<z.infer<typeof CreateProductSchema>>({
-    resolver: zodResolver(CreateProductSchema),
-    defaultValues: {
-      name: product?.name,
-      description: product?.description,
-      priceInCents: product?.priceInCents,
-      quantity: product?.inventory,
-      available: product?.available ? 'true' : 'false',
-    },
-    values: {
-      name: product!.name,
-      description: product!.description,
-      priceInCents: product!.priceInCents,
-      quantity: product!.inventory,
-      available: product!.available ? 'true' : 'false',
-    },
-=======
 interface EditProductFormProps {
   product: Product
 }
@@ -80,7 +35,6 @@ export default function EditProductForm({ product }: EditProductFormProps) {
       quantity: product.inventory,
       available: product.available ? 'true' : 'false',
     }
->>>>>>> 03fd2c7 (Managed to get edit button working)
   })
 
   async function onSubmit(values: z.infer<typeof CreateProductSchema>) {
