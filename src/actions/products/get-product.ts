@@ -14,7 +14,7 @@ export const getAllProducts = async () => {
   if (role !== UserRole.ADMIN) {
     return {
       error:
-        'You are not authorized to create a product. Please contact an admin for the necessary permissions.',
+        'You are not authorized to complete this action. Please contact an admin for the necessary permissions.',
     }
   }
 
@@ -37,7 +37,7 @@ export const getProductById = async (id: number) => {
   if (role !== UserRole.ADMIN) {
     return {
       error:
-        'You are not authorized to edit a product. Please contact an admin for the necessary permissions.',
+        'You are not authorized to complete this action. Please contact an admin for the necessary permissions.',
     }
   }
 
