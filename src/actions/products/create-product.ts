@@ -64,6 +64,7 @@ export const createProduct = async (
           description,
           priceInCents,
           inventory: quantity,
+          numAvailable: quantity,
           stripeProductId: stripeProduct.id,
           stripePriceId: stripeProduct.default_price as string,
           available: available === 'true' ? true : false,
