@@ -95,9 +95,7 @@ export const columns: ColumnDef<Product>[] = [
       const product = row.original;
   
       return (
-        <div className="flex items-center">
-          <EditProductButton product={product} />
-          <DeleteProductButton product={product} />
+        <div className="flex justify-end items-center space-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0 ml-2">
@@ -118,6 +116,8 @@ export const columns: ColumnDef<Product>[] = [
               <DropdownMenuItem>View product details</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <EditProductButton product={product} />
+          <DeleteProductButton product={product} />
         </div>
       );
     },
