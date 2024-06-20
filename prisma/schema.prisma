@@ -39,8 +39,8 @@ model User {
   accounts              Account[]
   isTwoFactorEnabled    Boolean                @default(false)
   twoFactorConfirmation TwoFactorConfirmation?
-  numPurchases          Int                    @default(0)
-  stripeCustomerId      String?
+
+  stripeCustomerId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -133,8 +133,11 @@ model Product {
   numSold          Int      @default(0)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  inventory        Int
-  available        Boolean  @default(true)
+
+  inventory    Int
+  numAvailable Int @default(dbgenerated("'inventory'"))
+
+  available Boolean @default(true)
 
   cartItems CartItem[]
   lineItems lineItem[]
