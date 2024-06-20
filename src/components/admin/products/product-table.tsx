@@ -39,6 +39,7 @@ import { getAllProducts } from '@/actions/products/get-product'
 import EditProductButton from './edit-product-button'
 
 import { useQuery } from '@tanstack/react-query'
+import DeleteProductButton from './delete-product-button'
 
 // Update data structure to reflect the new columns
 
@@ -118,6 +119,7 @@ export const columns: ColumnDef<Product>[] = [
       return (
         <div className="flex items-center">
           <EditProductButton product={product} />
+          <DeleteProductButton product={product} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0 ml-2">
