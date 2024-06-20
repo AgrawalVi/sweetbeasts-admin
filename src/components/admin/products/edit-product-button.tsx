@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button'
 import EditProductForm from './edit-product-form'
 import { useState } from 'react'
+import { Pencil } from 'lucide-react'
 
 interface EditProductButtonProps {
   product: Product
@@ -28,7 +29,7 @@ const EditProductButton: React.FC<EditProductButtonProps> = ({ product }) => {
     <>
       <Dialog open={mainOpen} onOpenChange={setMainOpen}>
         <DialogTrigger asChild>
-          <Button>Edit Product</Button>
+          <Pencil />
         </DialogTrigger>
         <DialogContent onEscapeKeyDown={onExit} onInteractOutside={onExit}>
           <DialogHeader>Edit Product</DialogHeader>
