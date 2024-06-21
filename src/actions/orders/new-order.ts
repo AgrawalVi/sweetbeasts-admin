@@ -7,6 +7,16 @@ export const createOrder = async (
 ) => {
   const checkoutSession = event.data.object
 
+  // check that the session is completed
+  if (checkoutSession.status !== 'complete') {
+    return
+  }
+
+  // verify that the payment has been processed before moving forward
+  if (checkoutSession.payment_status !== 'paid') {
+    return
+  }
+
   // get order information from event
   const timePlaced = new Date(event.created * 1000)
 
