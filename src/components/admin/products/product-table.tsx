@@ -92,13 +92,15 @@ export const columns: ColumnDef<Product>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const product = row.original;
-  
+      const product = row.original
+
       return (
-        <div className="flex justify-end items-center space-x-2">
+        <div className="flex items-center justify-end space-x-2">
+          <EditProductButton product={product} />
+          <DeleteProductButton product={product} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0 ml-2">
+              <Button variant="ghost" className="ml-2 h-8 w-8 p-0">
                 <span className="sr-only">Open menu</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
@@ -116,14 +118,10 @@ export const columns: ColumnDef<Product>[] = [
               <DropdownMenuItem>View product details</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <EditProductButton product={product} />
-          <DeleteProductButton product={product} />
         </div>
-      );
+      )
     },
-  }
-  
-  
+  },
 ]
 
 export default function ProductTable() {

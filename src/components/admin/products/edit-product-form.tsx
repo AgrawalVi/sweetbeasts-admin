@@ -13,7 +13,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
@@ -34,7 +40,7 @@ export default function EditProductForm({ product }: EditProductFormProps) {
       priceInCents: product.priceInCents,
       quantity: product.inventory,
       available: product.available ? 'true' : 'false',
-    }
+    },
   })
 
   async function onSubmit(values: z.infer<typeof CreateProductSchema>) {
@@ -96,7 +102,11 @@ export default function EditProductForm({ product }: EditProductFormProps) {
               <FormItem>
                 <FormLabel>Price</FormLabel>
                 <FormControl>
-                  <Input placeholder="Price in cents" type="number" {...field} />
+                  <Input
+                    placeholder="Price in cents"
+                    type="number"
+                    {...field}
+                  />
                 </FormControl>
                 <FormDescription>
                   Enter the price of the product, in cents
@@ -127,7 +137,10 @@ export default function EditProductForm({ product }: EditProductFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Available</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={product.available ? 'true' : 'false'}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={product.available ? 'true' : 'false'}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select if the product is available" />
