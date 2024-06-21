@@ -16,7 +16,9 @@ interface DeleteProductButtonProps {
   product: Product
 }
 
-const DeleteProductButton: React.FC<DeleteProductButtonProps> = ({ product }) => {
+const DeleteProductButton: React.FC<DeleteProductButtonProps> = ({
+  product,
+}) => {
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState<boolean>(false)
   const { toast } = useToast()
 
@@ -39,17 +41,25 @@ const DeleteProductButton: React.FC<DeleteProductButtonProps> = ({ product }) =>
 
   return (
     <>
-      <Button variant="ghost" onClick={() => setConfirmDeleteOpen(true)} className="h-8 w-8 p-0">
+      <Button
+        variant="ghost"
+        onClick={() => setConfirmDeleteOpen(true)}
+        className="h-8 w-8 p-0"
+      >
         <Trash className="h-4 w-4" />
       </Button>
       <Dialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
         <DialogContent>
           <DialogHeader>Confirm Delete</DialogHeader>
           <DialogDescription>
-            Are you sure you want to delete this product? This action cannot be undone.
+            Are you sure you want to delete this product? This action cannot be
+            undone.
           </DialogDescription>
           <div className="flex justify-end gap-4">
-            <Button variant="outline" onClick={() => setConfirmDeleteOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmDeleteOpen(false)}
+            >
               Cancel
             </Button>
             <Button variant="destructive" onClick={handleDelete}>

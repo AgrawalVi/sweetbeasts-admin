@@ -27,7 +27,11 @@ const EditProductButton: React.FC<EditProductButtonProps> = ({ product }) => {
 
   return (
     <>
-      <Button variant="ghost" onClick={() => setMainOpen(true)} className="h-8 w-8 p-0">
+      <Button
+        variant="ghost"
+        onClick={() => setMainOpen(true)}
+        className="h-8 w-8 p-0"
+      >
         <Pencil className="h-4 w-4" />
       </Button>
       <Dialog open={mainOpen} onOpenChange={setMainOpen}>
