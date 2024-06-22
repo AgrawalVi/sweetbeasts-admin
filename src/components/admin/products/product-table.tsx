@@ -14,7 +14,6 @@ import {
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -59,16 +58,21 @@ export const columns: ColumnDef<Product>[] = [
     cell: ({ row }) => <div className="capitalize">{row.getValue('name')}</div>,
   },
   {
-    accessorKey: 'price',
+    accessorKey: 'priceInCents',  // Updated to reference 'priceInCents'
     header: () => <div className="text-right">Product Price</div>,
     cell: ({ row }) => {
-      const price = parseFloat(row.getValue('price'))
+      const price = parseFloat(row.getValue('priceInCents')) / 100;
+
+      // Check if the price is a valid number
+      if (isNaN(price)) {
+        return <div className="text-right font-medium">N/A</div>
+      }
 
       // Format the price as a dollar amount
       const formatted = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
-      }).format(price)
+      }).format(price);
 
       return <div className="text-right font-medium">{formatted}</div>
     },
@@ -92,7 +96,7 @@ export const columns: ColumnDef<Product>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const product = row.original
+      const product = row.original;
 
       return (
         <div className="flex items-center justify-end space-x-2">
@@ -122,7 +126,8 @@ export const columns: ColumnDef<Product>[] = [
       )
     },
   },
-]
+];
+
 
 export default function ProductTable() {
   const { data, isError, isPending } = useQuery({
