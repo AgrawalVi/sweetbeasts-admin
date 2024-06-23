@@ -179,7 +179,12 @@ export const LoginForm = ({}) => {
           </div>
           <FormError message={error || urlError} />
           <FormSuccess message={success} />
-          <Button type="submit" className="w-full" disabled={isPending} ref={submitButtonRef}>
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isPending}
+            ref={submitButtonRef}
+          >
             {showTwoFactor ? 'Confirm' : 'Login'}
           </Button>
         </form>

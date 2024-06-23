@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -28,16 +28,25 @@ import { useToast } from '@/components/ui/use-toast'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
+const defaultValues = {
+  name: '',
+  description: '',
+  priceInCents: 0,
+  quantity: 0,
+  available: 'false' as 'true' | 'false',
+}
+
 interface CreateProductFormProps {
-  setInfoInForm: (value: boolean) => void
+  setIsChanged: (value: boolean) => void
   setOpen: (value: boolean) => void
 }
 
 export default function CreateProductForm({
-  setInfoInForm,
+  setIsChanged,
   setOpen,
 }: CreateProductFormProps) {
   const { toast } = useToast()
+  const queryClient = useQueryClient()
 
   const form = useForm<z.infer<typeof CreateProductSchema>>({
     resolver: zodResolver(CreateProductSchema),
@@ -46,28 +55,49 @@ export default function CreateProductForm({
       description: '',
       priceInCents: 0,
       quantity: 0,
-      available: 'true',
+      available: 'false',
     },
   })
 
-  async function onSubmit(values: z.infer<typeof CreateProductSchema>) {
-    let result = await createProduct(values)
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      console.log(JSON.stringify(value))
+      console.log(JSON.stringify(defaultValues))
+      const hasChanged = JSON.stringify(value) !== JSON.stringify(defaultValues)
+      setIsChanged(hasChanged)
+    })
 
-    if (result.success) {
+    return () => subscription.unsubscribe()
+  }, [form, setIsChanged])
+
+  async function onSubmit(values: z.infer<typeof CreateProductSchema>) {
+    mutation.mutate(values)
+  }
+
+  const mutation = useMutation({
+    mutationFn: async (values: z.infer<typeof CreateProductSchema>) => {
+      const result = await createProduct(values)
+      if (result.error) {
+        throw new Error(result.error)
+      }
+      return values
+    },
+    onSuccess: (data) => {
       toast({
         title: 'Product added',
-        description: `${values.name} added successfully`,
+        description: `${data.name} added successfully`,
       })
       setOpen(false)
-    }
-    if (result.error) {
+      queryClient.invalidateQueries({ queryKey: ['all-products'] })
+    },
+    onError: (error) => {
       toast({
         title: 'An error has occurred',
-        description: result.error,
+        description: error.message,
         variant: 'destructive',
       })
-    }
-  }
+    },
+  })
 
   return (
     <Form {...form}>
@@ -161,7 +191,9 @@ export default function CreateProductForm({
           />
         </div>
         {/* <FormField */}
-        <Button type="submit">Add Product</Button>
+        <Button type="submit" disabled={mutation.isPending}>
+          Add Product
+        </Button>
       </form>
     </Form>
   )

@@ -4,12 +4,6 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -23,6 +17,15 @@ datasource db {
 enum UserRole {
   CUSTOMER
   ADMIN
+}
+
+enum OrderStatus {
+  PROCESSING
+  CANCELLED
+  SHIPPED
+  DELIVERED
+  EXCEPTION
+  RETURNED
 }
 
 model User {
@@ -42,7 +45,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  cartItems CartItem[]
+  cartItems       CartItem[]
+  ShippingAddress ShippingAddress[]
 }
 
 model Account {
@@ -107,6 +111,7 @@ model CartItem {
   userId    String?
   guestId   String?
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   quantity  Int
   productId Int
 
@@ -126,51 +131,68 @@ model Product {
   stripePriceId    String   @unique
   primaryImagePath String?
   numSold          Int      @default(0)
-  dateCreated      DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
   inventory        Int
   available        Boolean  @default(true)
 
   cartItems CartItem[]
+  lineItems lineItem[]
 }
 
-// model user {
-//   id                     String   @id @default(cuid())
-//   firstName              String
-//   lastName               String
-//   subscribedToNewsletter Boolean  @default(false)
-//   email                  String   @unique
-//   phone                  String?
-//   createdAt              DateTime @default(now())
-//   numOrders              Int @default(0)
+model Order {
+  id        Int      @id @default(autoincrement())
+  userId    String?
+  email     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-//   cart    Cart?
-//   orders  Order[]
-//   reviews Review[]
-// }
+  stripeOrderId    String @unique
+  stripeCustomreId String
 
-// model Order {
-//   id               Int      @id @default(autoincrement())
-//   pricePaidInCents Int[]
-//   dateCreated      DateTime @default(now())
-//   dateShipped      DateTime
-//   trackingNumber   String
-//   // Need to add address information
-//   //address String
-//   status           Int
+  shippingAddressId Int
+  shippingAddress   ShippingAddress @relation(fields: [shippingAddressId], references: [id])
 
-//   userId String
-//   user   user  @relation(fields: [userId], references: [id], onDelete: Restrict)
-//   products   Product[]
-// }
+  pricePaidInCents Int
+  orderStatus      OrderStatus @default(PROCESSING)
 
-// model Review {
-//   id        Int    @id @default(autoincrement())
-//   productId Int
-//   title     String
-//   content   String
-//   rating    Int
-//   authorId  String
+  lineItems lineItem[]
+}
 
-//   product Product  @relation(fields: [productId], references: [id])
-//   author  user @relation(fields: [authorId], references: [id])
-// }
+model lineItem {
+  id                  Int     @id @default(autoincrement())
+  userId              String?
+  email               String
+  pricePerUnitInCents Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  productId Int
+  quantity  Int
+
+  Order   Order?   @relation(fields: [orderId], references: [id])
+  Product Product? @relation(fields: [productId], references: [id])
+
+  orderId Int
+}
+
+model ShippingAddress {
+  id     Int     @id @default(autoincrement())
+  userId String?
+  email  String
+
+  recipientName String
+  addressLine1  String
+  addressLine2  String?
+  city          String
+  state         String
+  zipCode       String
+  countryCode   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  User  User?   @relation(fields: [userId], references: [id])
+  Order Order[]
+}
