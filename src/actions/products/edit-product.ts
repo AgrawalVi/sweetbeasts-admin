@@ -18,7 +18,7 @@ export const editProduct = async (
   if (role !== UserRole.ADMIN) {
     return {
       error:
-        'You are not authorized to create a product. Please contact an admin for the necessary permissions.',
+        'You are not authorized to edit a product. Please contact an admin for the necessary permissions.',
     }
   }
   // verify that the fields are valid

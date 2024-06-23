@@ -29,7 +29,7 @@ export const deleteProduct = async (productId: number) => {
     await db.cartItem.deleteMany({
       where: { productId: existingProduct.id },
     })
-    
+
     // Delete the product
     await db.product.delete({
       where: { id: existingProduct.id },
