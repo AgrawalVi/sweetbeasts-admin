@@ -14,7 +14,6 @@ import {
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -41,61 +40,69 @@ import EditProductButton from './edit-product-button'
 import { useQuery } from '@tanstack/react-query'
 import DeleteProductButton from './delete-product-button'
 
-// Update data structure to reflect the new columns
 
 // Update columns to match the new data structure
 export const columns: ColumnDef<Product>[] = [
   {
     accessorKey: 'name',
     header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Product Name
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
+      <div className="px-4 py-2 text-center">
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className="flex items-center justify-center space-x-2"
+        >
+          <span>Product Name</span>
+          <ArrowUpDown className="h-4 w-4" />
+        </Button>
+      </div>
     ),
-    cell: ({ row }) => <div className="capitalize">{row.getValue('name')}</div>,
+    cell: ({ row }) => (
+      <div className="px-4 py-2 text-left capitalize ml-8">{row.getValue('name')}</div>
+    ),
   },
   {
-    accessorKey: 'price',
-    header: () => <div className="text-right">Product Price</div>,
+    accessorKey: 'priceInCents',
+    header: () => <div className="px-4 py-2 text-center">Product Price</div>,
     cell: ({ row }) => {
-      const price = parseFloat(row.getValue('price'))
+      const price = parseFloat(row.getValue('priceInCents')) / 100;
 
-      // Format the price as a dollar amount
+      if (isNaN(price)) {
+        return <div className="px-4 py-2 text-center font-medium">N/A</div>;
+      }
+
       const formatted = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
-      }).format(price)
+      }).format(price);
 
-      return <div className="text-right font-medium">{formatted}</div>
+      return <div className="px-4 py-2 text-center font-medium">{formatted}</div>;
     },
   },
   {
     accessorKey: 'inventory',
-    header: 'Product Quantity',
-    cell: ({ row }) => <div>{row.getValue('inventory')}</div>,
+    header: () => <div className="px-4 py-2 text-center">Product Quantity</div>,
+    cell: ({ row }) => <div className="px-4 py-2 text-center">{row.getValue('inventory')}</div>,
   },
   {
     accessorKey: 'available',
-    header: 'Available',
-    cell: ({ row }) => <div>{row.getValue('available') ? 'Yes' : 'No'}</div>,
+    header: () => <div className="px-4 py-2 text-center">Available</div>,
+    cell: ({ row }) => <div className="px-4 py-2 text-center">{row.getValue('available') ? 'Yes' : 'No'}</div>,
   },
   {
     accessorKey: 'numSold',
-    header: 'Number Ordered',
-    cell: ({ row }) => <div>{row.getValue('numSold')}</div>,
+    header: () => <div className="px-4 py-2 text-center">Number Ordered</div>,
+    cell: ({ row }) => <div className="px-4 py-2 text-center">{row.getValue('numSold')}</div>,
   },
   {
     id: 'actions',
     enableHiding: false,
+    header: () => <div className="px-4 py-2 text-center">Actions</div>,
     cell: ({ row }) => {
-      const product = row.original
+      const product = row.original;
 
       return (
-        <div className="flex items-center justify-end space-x-2">
+        <div className="px-4 py-2 text-center flex justify-center items-center space-x-2">
           <EditProductButton product={product} />
           <DeleteProductButton product={product} />
           <DropdownMenu>
@@ -119,10 +126,12 @@ export const columns: ColumnDef<Product>[] = [
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      )
+      );
     },
   },
-]
+];
+
+
 
 export default function ProductTable() {
   const { data, isError, isPending } = useQuery({
