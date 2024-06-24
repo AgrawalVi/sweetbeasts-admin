@@ -163,9 +163,7 @@ model Order {
 }
 
 model lineItem {
-  id                  Int     @id @default(autoincrement())
-  userId              String?
-  email               String
+  id                  Int @id @default(autoincrement())
   pricePerUnitInCents Int
 
   createdAt DateTime @default(now())
@@ -185,13 +183,13 @@ model ShippingAddress {
   userId String?
   email  String
 
-  recipientName String
-  addressLine1  String
+  recipientName String?
+  addressLine1  String?
   addressLine2  String?
-  city          String
-  state         String
-  zipCode       String
-  countryCode   String
+  city          String?
+  state         String?
+  zipCode       String?
+  countryCode   String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
