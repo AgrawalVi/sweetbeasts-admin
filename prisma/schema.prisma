@@ -151,7 +151,7 @@ model Order {
   updatedAt DateTime @updatedAt
 
   stripeOrderId    String @unique
-  stripeCustomreId String
+  stripeCustomerId String
 
   shippingAddressId Int
   shippingAddress   ShippingAddress @relation(fields: [shippingAddressId], references: [id])
