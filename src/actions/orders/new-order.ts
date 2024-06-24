@@ -41,16 +41,17 @@ export const createOrder = async (
         timePlaced,
         user,
         stripeCustomer,
+        stripeCustomer.email as string,
       )
     } else {
+      const order = await createOrderHelper(
+        checkoutSession,
+        timePlaced,
+        user,
+        stripeCustomer,
+        stripeCustomer.email as string,
+      )
     }
-    // create order in database
-    const order = await createOrderHelper(
-      checkoutSession,
-      timePlaced,
-      user,
-      stripeCustomer,
-    )
   }
 
   // link order to customer based off email or stripe customer id
@@ -61,6 +62,7 @@ const createOrderHelper = async (
   timePlaced: Date,
   user: User | null,
   stripeCustomer: Stripe.Customer,
+  email: string,
 ) => {
   console.log('Webhook event hit')
   let lineItems
@@ -99,10 +101,10 @@ const createOrderHelper = async (
     await db.order.create({
       data: {
         userId: user?.id,
-        email: user?.email || session.customer_email || 'NOT_PROVIDED',
+        email,
         createdAt: timePlaced,
         stripeOrderId: session.id,
-        stripeCustomreId: stripeCustomer.id,
+        stripeCustomerId: stripeCustomer.id,
         shippingAddress: {
           create: {
             userId: user?.id,

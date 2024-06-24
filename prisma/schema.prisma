@@ -172,8 +172,8 @@ model lineItem {
   productId Int
   quantity  Int
 
-  Order   Order?   @relation(fields: [orderId], references: [id])
-  Product Product? @relation(fields: [productId], references: [id])
+  Order   Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  Product Product? @relation(fields: [productId], references: [id], onDelete: Restrict)
 
   orderId Int
 }
@@ -193,6 +193,6 @@ model ShippingAddress {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  User  User?   @relation(fields: [userId], references: [id])
+  User  User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
   Order Order[]
 }
