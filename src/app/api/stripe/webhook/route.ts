@@ -1,3 +1,4 @@
+import { createOrder } from '@/actions/orders/new-order'
 import { stripe } from '@/lib/stripe'
 import { NextResponse } from 'next/server'
 
@@ -26,7 +27,8 @@ export const POST = async (req: Request, res: Response) => {
   }
 
   if (event.type === 'checkout.session.completed') {
-    console.log(event)
+    createOrder(event)
   }
+
   return NextResponse.json({ status: 200 })
 }

@@ -62,6 +62,7 @@ const createOrderHelper = async (
   user: User | null,
   stripeCustomer: Stripe.Customer,
 ) => {
+  console.log('Webhook event hit')
   let lineItems
   try {
     lineItems = await stripe.checkout.sessions.listLineItems(session.id)
@@ -85,6 +86,13 @@ const createOrderHelper = async (
     }),
   )
 
+  // add up all the prices to get the total price paid in the lineItems array
+  let totalPrice = 0
+  lineItems.data.forEach((item) => {
+    totalPrice +=
+      (item.price?.unit_amount as number) * (item.quantity as number)
+  })
+
   let filteredLineItemsToAdd = lineItemsToAdd.filter(notEmpty)
 
   try {
@@ -98,7 +106,6 @@ const createOrderHelper = async (
         shippingAddress: {
           create: {
             userId: user?.id,
-            email: user?.email || (session.customer_email as string),
             recipientName: session.shipping_details?.name,
             addressLine1: session.shipping_details?.address?.line1,
             addressLine2: session.shipping_details?.address?.line2,
@@ -116,7 +123,7 @@ const createOrderHelper = async (
             pricePerUnitInCents: item.pricePaidInCents,
           })),
         },
-        pricePaidInCents: 100,
+        pricePaidInCents: totalPrice,
       },
     })
   } catch (e) {

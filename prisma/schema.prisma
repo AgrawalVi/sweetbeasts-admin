@@ -135,7 +135,7 @@ model Product {
   updatedAt        DateTime @updatedAt
 
   inventory    Int
-  numAvailable Int @default(dbgenerated("'inventory'"))
+  numAvailable Int
 
   available Boolean @default(true)
 
@@ -181,7 +181,6 @@ model lineItem {
 model ShippingAddress {
   id     Int     @id @default(autoincrement())
   userId String?
-  email  String
 
   recipientName String?
   addressLine1  String?
