@@ -47,6 +47,7 @@ model User {
 
   cartItems       CartItem[]
   ShippingAddress ShippingAddress[]
+  Order           Order[]
 }
 
 model Account {
@@ -160,6 +161,7 @@ model Order {
   orderStatus      OrderStatus @default(PROCESSING)
 
   lineItems lineItem[]
+  user      User?      @relation(fields: [userId], references: [id], onDelete: NoAction)
 }
 
 model lineItem {
@@ -181,6 +183,7 @@ model lineItem {
 model ShippingAddress {
   id     Int     @id @default(autoincrement())
   userId String?
+  email  String
 
   recipientName String?
   addressLine1  String?
@@ -193,6 +196,6 @@ model ShippingAddress {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  User  User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
   Order Order[]
+  User  User?   @relation(fields: [userId], references: [id])
 }

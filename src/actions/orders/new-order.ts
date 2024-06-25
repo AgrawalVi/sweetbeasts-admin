@@ -2,9 +2,10 @@ import { db } from '@/lib/db'
 import { stripe } from '@/lib/stripe'
 import Stripe from 'stripe'
 import { getUserByEmail } from '@/data/auth/user'
-import { User } from '@prisma/client'
+import { ShippingAddress, User } from '@prisma/client'
 import { getProductByStripePriceId } from '@/data/admin/products'
 import { notEmpty } from '@/lib/utils'
+import { getAddressByAddressAndEmail } from '@/data/customers/address'
 
 export const createOrder = async (
   event: Stripe.CheckoutSessionCompletedEvent,
@@ -97,27 +98,40 @@ const createOrderHelper = async (
 
   let filteredLineItemsToAdd = lineItemsToAdd.filter(notEmpty)
 
+  // check if the customer already has used this address
+  const address: ShippingAddress = {
+    id: 0,
+    userId: user?.id || null,
+    email: stripeCustomer.email as string,
+    recipientName: session.shipping_details?.name || null,
+    addressLine1: session.shipping_details?.address?.line1 || null,
+    addressLine2: session.shipping_details?.address?.line2 || null,
+    city: session.shipping_details?.address?.city || null,
+    state: session.shipping_details?.address?.state || null,
+    zipCode: session.shipping_details?.address?.postal_code || null,
+    countryCode: session.shipping_details?.address?.country || null,
+    createdAt: timePlaced,
+    updatedAt: timePlaced,
+  }
+
+  const existingAddress = await getAddressByAddressAndEmail(
+    address,
+    stripeCustomer.email as string,
+  )
+  let addressIdToAdd
+  if (existingAddress) {
+    addressIdToAdd = existingAddress.id
+  }
+
   try {
     await db.order.create({
       data: {
         userId: user?.id,
         email,
         createdAt: timePlaced,
+        updatedAt: timePlaced,
         stripeOrderId: session.id,
         stripeCustomerId: stripeCustomer.id,
-        shippingAddress: {
-          create: {
-            userId: user?.id,
-            recipientName: session.shipping_details?.name,
-            addressLine1: session.shipping_details?.address?.line1,
-            addressLine2: session.shipping_details?.address?.line2,
-            city: session.shipping_details?.address?.city,
-            state: session.shipping_details?.address?.state,
-            zipCode: session.shipping_details?.address?.postal_code,
-            countryCode: session.shipping_details?.address?.country,
-            createdAt: timePlaced,
-          },
-        },
         lineItems: {
           create: filteredLineItemsToAdd.map((item) => ({
             productId: item.productId,
@@ -126,6 +140,27 @@ const createOrderHelper = async (
           })),
         },
         pricePaidInCents: totalPrice,
+        ...(addressIdToAdd
+          ? {
+              shippingAddressId: addressIdToAdd,
+            }
+          : {
+              shippingAddress: {
+                create: {
+                  userId: user?.id,
+                  email: stripeCustomer.email as string,
+                  recipientName: session.shipping_details?.name,
+                  addressLine1: session.shipping_details?.address?.line1,
+                  addressLine2: session.shipping_details?.address?.line2,
+                  city: session.shipping_details?.address?.city,
+                  state: session.shipping_details?.address?.state,
+                  zipCode: session.shipping_details?.address?.postal_code,
+                  countryCode: session.shipping_details?.address?.country,
+                  createdAt: timePlaced,
+                  updatedAt: timePlaced,
+                },
+              },
+            }),
       },
     })
   } catch (e) {
