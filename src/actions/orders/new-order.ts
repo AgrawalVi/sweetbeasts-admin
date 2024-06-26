@@ -10,6 +10,8 @@ import { getAddressByAddressAndEmail } from '@/data/customers/address'
 export const createOrder = async (
   event: Stripe.CheckoutSessionCompletedEvent,
 ) => {
+  console.log('Webhook event hit')
+
   const checkoutSession = event.data.object as Stripe.Checkout.Session
 
   // check that the session is completed
@@ -30,9 +32,10 @@ export const createOrder = async (
 
   const stripeCustomer = await stripe.customers.retrieve(stripeCustomerId)
   if (!stripeCustomer.deleted) {
-    const user = await getUserByEmail(checkoutSession.customer_email)
+    console.log('stripeCustomer', stripeCustomer)
+    const user = await getUserByEmail(stripeCustomer.email as string)
+    console.log('user', user)
 
-    console.log('Webhook event hit')
     let lineItems
     try {
       lineItems = await stripe.checkout.sessions.listLineItems(
@@ -97,7 +100,7 @@ export const createOrder = async (
       if (addressIdToAdd) {
         await db.order.create({
           data: {
-            userId: '10',
+            userId: user?.id,
             email: stripeCustomer.email as string,
             createdAt: timePlaced,
             updatedAt: timePlaced,
