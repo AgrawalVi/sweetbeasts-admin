@@ -25,9 +25,6 @@ export const createOrder = async (
   // get order information from event
   const timePlaced = new Date(event.created * 1000)
 
-  // need to get line items from a checkout session and decrease the inventory in our database
-  const lineItems = checkoutSession.line_items?.data
-
   // get user and create an order in the database
   const stripeCustomerId = checkoutSession.customer as string
 
