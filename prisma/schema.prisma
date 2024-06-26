@@ -40,7 +40,7 @@ model User {
   isTwoFactorEnabled    Boolean                @default(false)
   twoFactorConfirmation TwoFactorConfirmation?
 
-  stripeCustomerId String?
+  stripeCustomerId String? @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -155,13 +155,13 @@ model Order {
   stripeCustomerId String
 
   shippingAddressId Int
-  shippingAddress   ShippingAddress @relation(fields: [shippingAddressId], references: [id])
+  ShippingAddress   ShippingAddress @relation(fields: [shippingAddressId], references: [id], onDelete: Restrict)
 
   pricePaidInCents Int
   orderStatus      OrderStatus @default(PROCESSING)
 
   lineItems lineItem[]
-  user      User?      @relation(fields: [userId], references: [id], onDelete: NoAction)
+  User      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model lineItem {
@@ -197,5 +197,5 @@ model ShippingAddress {
   updatedAt DateTime @updatedAt
 
   Order Order[]
-  User  User?   @relation(fields: [userId], references: [id])
+  User  User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 }

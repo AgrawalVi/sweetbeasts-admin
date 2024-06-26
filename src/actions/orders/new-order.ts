@@ -124,45 +124,63 @@ const createOrderHelper = async (
   }
 
   try {
-    await db.order.create({
-      data: {
-        userId: user?.id,
-        email,
-        createdAt: timePlaced,
-        updatedAt: timePlaced,
-        stripeOrderId: session.id,
-        stripeCustomerId: stripeCustomer.id,
-        lineItems: {
-          create: filteredLineItemsToAdd.map((item) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-            pricePerUnitInCents: item.pricePaidInCents,
-          })),
+    if (addressIdToAdd) {
+      await db.order.create({
+        data: {
+          userId: '10',
+          email,
+          createdAt: timePlaced,
+          updatedAt: timePlaced,
+          stripeOrderId: session.id,
+          stripeCustomerId: stripeCustomer.id,
+          lineItems: {
+            create: filteredLineItemsToAdd.map((item) => ({
+              productId: item.productId,
+              quantity: item.quantity,
+              pricePerUnitInCents: item.pricePaidInCents,
+            })),
+          },
+          pricePaidInCents: totalPrice,
+          shippingAddressId: addressIdToAdd,
         },
-        pricePaidInCents: totalPrice,
-        ...(addressIdToAdd
-          ? {
-              shippingAddressId: addressIdToAdd,
-            }
-          : {
-              shippingAddress: {
-                create: {
-                  userId: user?.id,
-                  email: stripeCustomer.email as string,
-                  recipientName: session.shipping_details?.name,
-                  addressLine1: session.shipping_details?.address?.line1,
-                  addressLine2: session.shipping_details?.address?.line2,
-                  city: session.shipping_details?.address?.city,
-                  state: session.shipping_details?.address?.state,
-                  zipCode: session.shipping_details?.address?.postal_code,
-                  countryCode: session.shipping_details?.address?.country,
-                  createdAt: timePlaced,
-                  updatedAt: timePlaced,
-                },
-              },
-            }),
-      },
-    })
+      })
+    } else {
+      const shippingAddress = await db.shippingAddress.create({
+        data: {
+          userId: user?.id,
+          email: stripeCustomer.email as string,
+          recipientName: session.shipping_details?.name,
+          addressLine1: session.shipping_details?.address?.line1,
+          addressLine2: session.shipping_details?.address?.line2,
+          city: session.shipping_details?.address?.city,
+          state: session.shipping_details?.address?.state,
+          zipCode: session.shipping_details?.address?.postal_code,
+          countryCode: session.shipping_details?.address?.country,
+          createdAt: timePlaced,
+          updatedAt: timePlaced,
+        },
+      })
+
+      await db.order.create({
+        data: {
+          userId: user?.id,
+          email,
+          createdAt: timePlaced,
+          updatedAt: timePlaced,
+          stripeOrderId: session.id,
+          stripeCustomerId: stripeCustomer.id,
+          lineItems: {
+            create: filteredLineItemsToAdd.map((item) => ({
+              productId: item.productId,
+              quantity: item.quantity,
+              pricePerUnitInCents: item.pricePaidInCents,
+            })),
+          },
+          pricePaidInCents: totalPrice,
+          shippingAddressId: shippingAddress.id,
+        },
+      })
+    }
   } catch (e) {
     console.error('unable to create order', e)
     return { error: 'Unable to create order' }
