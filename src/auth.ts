@@ -44,9 +44,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
   callbacks: {
     async signIn({ user, account }) {
-      // allow 0Auth without email verification
+      // providers credentials are not allowed to sign in here
       if (account?.provider !== 'credentials') {
-        return true
+        return false
       }
 
       const existingUser = await getUserById(user.id)
@@ -56,9 +56,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return false
       }
 
-      // if (existingUser.role !== "ADMIN") {
-      //   return false
-      // }
+      if (existingUser.role !== 'ADMIN') {
+        return false
+      }
 
       if (existingUser.isTwoFactorEnabled) {
         const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
