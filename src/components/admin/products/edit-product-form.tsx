@@ -27,10 +27,24 @@ import { Product } from '@prisma/client'
 
 interface EditProductFormProps {
   product: Product
+  setIsChanged: (value: boolean) => void
+  setOpen: (value: boolean) => void
 }
 
-export default function EditProductForm({ product }: EditProductFormProps) {
+export default function EditProductForm({
+  product,
+  setIsChanged,
+  setOpen,
+}: EditProductFormProps) {
   const { toast } = useToast()
+
+  const defaultValues = {
+    name: product.name,
+    description: product.description,
+    priceInCents: product.priceInCents,
+    quantity: product.inventory,
+    available: product.available ? 'true' : 'false',
+  }
 
   const form = useForm<z.infer<typeof CreateProductSchema>>({
     resolver: zodResolver(CreateProductSchema),
@@ -42,6 +56,17 @@ export default function EditProductForm({ product }: EditProductFormProps) {
       available: product.available ? 'true' : 'false',
     },
   })
+
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      console.log(JSON.stringify(value))
+      console.log(JSON.stringify(defaultValues))
+      const hasChanged = JSON.stringify(value) !== JSON.stringify(defaultValues)
+      setIsChanged(hasChanged)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [form, setIsChanged])
 
   async function onSubmit(values: z.infer<typeof CreateProductSchema>) {
     let result = await editProduct(values, product.id) // Correct order of parameters

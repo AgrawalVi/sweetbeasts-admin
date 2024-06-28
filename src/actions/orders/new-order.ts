@@ -159,7 +159,7 @@ export const createOrder = async (
       return { error: 'Unable to create order' }
     }
 
-    // decrease inventory for each product that's been purchased in the lineItems array
+    // decrease inventory and increase numSold for each product that's been purchased in the lineItems array
     for (const item of filteredLineItemsToAdd) {
       try {
         const product = await db.product.update({
@@ -169,6 +169,9 @@ export const createOrder = async (
           data: {
             inventory: {
               decrement: item.quantity,
+            },
+            numSold: {
+              increment: item.quantity,
             },
           },
         })

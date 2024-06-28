@@ -18,13 +18,16 @@ interface EditProductButtonProps {
 const EditProductButton: React.FC<EditProductButtonProps> = ({ product }) => {
   const [mainOpen, setMainOpen] = useState<boolean>(false)
   const [confirmExitOpen, setConfirmExitOpen] = useState<boolean>(false)
-  const [infoInForm, setInfoInForm] = useState<boolean>(false)
+  const [isChanged, setIsChanged] = useState<boolean>(false)
 
   const onExit = (event: any) => {
     event.preventDefault() // prevent the default form closure
-    setConfirmExitOpen(true)
+    if (isChanged) {
+      setConfirmExitOpen(true)
+    } else {
+      setMainOpen(false)
+    }
   }
-
   return (
     <>
       <Button
@@ -40,7 +43,11 @@ const EditProductButton: React.FC<EditProductButtonProps> = ({ product }) => {
           <DialogDescription>
             Fill out the form to edit the product
           </DialogDescription>
-          <EditProductForm product={product} />
+          <EditProductForm
+            product={product}
+            setIsChanged={setIsChanged}
+            setOpen={setMainOpen}
+          />
         </DialogContent>
       </Dialog>
 

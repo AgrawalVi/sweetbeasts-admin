@@ -84,7 +84,7 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: 'inventory',
-    header: () => <div className="px-4 py-2 text-center">Product Quantity</div>,
+    header: () => <div className="px-4 py-2 text-center">Inventory</div>,
     cell: ({ row }) => (
       <div className="px-4 py-2 text-center">{row.getValue('inventory')}</div>
     ),
