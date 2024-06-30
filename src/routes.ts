@@ -1,7 +1,7 @@
 /**
  * Public routes available to any users
  */
-export const publicRoutes = ['/', '/auth/verify-email']
+export const publicRoutes = ['/', '/auth/verify-email', '/api/stripe/webhook']
 
 /**
  * An array of routes that are used for authentication

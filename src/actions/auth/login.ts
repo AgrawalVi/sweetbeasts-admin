@@ -26,6 +26,10 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     return { error: 'Invalid credentials' }
   }
 
+  if (existingUser.role !== 'ADMIN') {
+    return { error: 'You are not authorized to login' }
+  }
+
   if (existingUser && !existingUser.emailVerified) {
     const verificationToken = await generateVerificationToken(
       existingUser.email,

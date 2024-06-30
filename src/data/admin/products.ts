@@ -34,3 +34,21 @@ export async function getAllProducts() {
     return null
   }
 }
+
+export async function getProductByStripePriceId(
+  stripePriceId: string | undefined | null,
+) {
+  try {
+    if (!stripePriceId) {
+      return null
+    }
+    const product = await db.product.findFirst({
+      where: {
+        stripePriceId: stripePriceId,
+      },
+    })
+    return product
+  } catch {
+    return null
+  }
+}

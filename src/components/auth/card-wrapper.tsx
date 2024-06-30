@@ -29,11 +29,6 @@ export const CardWrapper = ({
         <Header label={headerLabel} />
       </CardHeader>
       <CardContent className="pb-3">{children}</CardContent>
-      {showSocial && (
-        <CardFooter className="pb-3">
-          <Social googleButtonText={googleButtonText} />
-        </CardFooter>
-      )}
       <CardFooter>
         <BackButton label={backButtonLabel} href={backButtonHref}></BackButton>
       </CardFooter>

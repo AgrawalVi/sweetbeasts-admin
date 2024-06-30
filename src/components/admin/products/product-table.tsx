@@ -40,7 +40,6 @@ import EditProductButton from './edit-product-button'
 import { useQuery } from '@tanstack/react-query'
 import DeleteProductButton from './delete-product-button'
 
-
 // Update columns to match the new data structure
 export const columns: ColumnDef<Product>[] = [
   {
@@ -58,51 +57,63 @@ export const columns: ColumnDef<Product>[] = [
       </div>
     ),
     cell: ({ row }) => (
-      <div className="px-4 py-2 text-left capitalize ml-8">{row.getValue('name')}</div>
+      <div className="ml-8 px-4 py-2 text-left capitalize">
+        {row.getValue('name')}
+      </div>
     ),
   },
   {
     accessorKey: 'priceInCents',
     header: () => <div className="px-4 py-2 text-center">Product Price</div>,
     cell: ({ row }) => {
-      const price = parseFloat(row.getValue('priceInCents')) / 100;
+      const price = parseFloat(row.getValue('priceInCents')) / 100
 
       if (isNaN(price)) {
-        return <div className="px-4 py-2 text-center font-medium">N/A</div>;
+        return <div className="px-4 py-2 text-center font-medium">N/A</div>
       }
 
       const formatted = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
-      }).format(price);
+      }).format(price)
 
-      return <div className="px-4 py-2 text-center font-medium">{formatted}</div>;
+      return (
+        <div className="px-4 py-2 text-center font-medium">{formatted}</div>
+      )
     },
   },
   {
     accessorKey: 'inventory',
-    header: () => <div className="px-4 py-2 text-center">Product Quantity</div>,
-    cell: ({ row }) => <div className="px-4 py-2 text-center">{row.getValue('inventory')}</div>,
+    header: () => <div className="px-4 py-2 text-center">Inventory</div>,
+    cell: ({ row }) => (
+      <div className="px-4 py-2 text-center">{row.getValue('inventory')}</div>
+    ),
   },
   {
     accessorKey: 'available',
     header: () => <div className="px-4 py-2 text-center">Available</div>,
-    cell: ({ row }) => <div className="px-4 py-2 text-center">{row.getValue('available') ? 'Yes' : 'No'}</div>,
+    cell: ({ row }) => (
+      <div className="px-4 py-2 text-center">
+        {row.getValue('available') ? 'Yes' : 'No'}
+      </div>
+    ),
   },
   {
     accessorKey: 'numSold',
     header: () => <div className="px-4 py-2 text-center">Number Ordered</div>,
-    cell: ({ row }) => <div className="px-4 py-2 text-center">{row.getValue('numSold')}</div>,
+    cell: ({ row }) => (
+      <div className="px-4 py-2 text-center">{row.getValue('numSold')}</div>
+    ),
   },
   {
     id: 'actions',
     enableHiding: false,
     header: () => <div className="px-4 py-2 text-center">Actions</div>,
     cell: ({ row }) => {
-      const product = row.original;
+      const product = row.original
 
       return (
-        <div className="px-4 py-2 text-center flex justify-center items-center space-x-2">
+        <div className="flex items-center justify-center space-x-2 px-4 py-2 text-center">
           <EditProductButton product={product} />
           <DeleteProductButton product={product} />
           <DropdownMenu>
@@ -126,12 +137,10 @@ export const columns: ColumnDef<Product>[] = [
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      );
+      )
     },
   },
-];
-
-
+]
 
 export default function ProductTable() {
   const { data, isError, isPending } = useQuery({
