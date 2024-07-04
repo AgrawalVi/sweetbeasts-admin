@@ -28,6 +28,11 @@ enum OrderStatus {
   RETURNED
 }
 
+enum ShippingMethod {
+  STANDARD
+  EXPEDITED
+}
+
 model User {
   id                    String                 @id @default(cuid())
   name                  String?
@@ -40,7 +45,9 @@ model User {
   isTwoFactorEnabled    Boolean                @default(false)
   twoFactorConfirmation TwoFactorConfirmation?
 
-  stripeCustomerId String? @unique
+  newsletterSubscribed Boolean @default(false)
+
+  stripeCustomerId String @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -151,21 +158,31 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  orderNumber String @unique
+
   stripeOrderId    String @unique
   stripeCustomerId String
 
   shippingAddressId Int
   ShippingAddress   ShippingAddress @relation(fields: [shippingAddressId], references: [id], onDelete: Restrict)
 
-  pricePaidInCents Int
-  orderStatus      OrderStatus @default(PROCESSING)
+  couponId String?
 
-  lineItems lineItem[]
-  User      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  totalPaidInCents    Int
+  taxesPaidInCents    Int?
+  shippingPaidInCents Int?
+
+  shippingMethod ShippingMethod @default(STANDARD)
+  orderStatus    OrderStatus    @default(PROCESSING)
+
+  lineItems      lineItem[]
+  User           User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  ViewOrderToken ViewOrderToken[]
 }
 
 model lineItem {
-  id                  Int @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
   pricePerUnitInCents Int
 
   createdAt DateTime @default(now())
@@ -198,4 +215,15 @@ model ShippingAddress {
 
   Order Order[]
   User  User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model ViewOrderToken {
+  id      String   @id @default(cuid())
+  orderId Int
+  token   String   @unique
+  expires DateTime
+
+  Order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, token])
 }
