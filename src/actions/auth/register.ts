@@ -3,6 +3,7 @@
 import * as z from 'zod'
 import bcrypt from 'bcryptjs'
 import { db } from '@/lib/db'
+import { stripe } from '@/lib/stripe'
 
 import { RegisterSchema } from '@/schemas'
 import { getUserByEmail } from '@/data/auth/user'
@@ -26,11 +27,17 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     return { error: 'Account already exists, please Login!' }
   }
 
+  const stripeCustomer = await stripe.customers.create({
+    email,
+    name,
+  })
+
   await db.user.create({
     data: {
       name,
       email,
       password: hashedPassword,
+      stripeCustomerId: stripeCustomer.id,
     },
   })
 
