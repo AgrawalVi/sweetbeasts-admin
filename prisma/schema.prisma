@@ -138,25 +138,27 @@ model Product {
   stripeProductId  String   @unique
   stripePriceId    String   @unique
   primaryImagePath String?
+  productHref      String   @default("/products")
   numSold          Int      @default(0)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  inventory    Int
-  numAvailable Int
+  inventory Int
 
   available Boolean @default(true)
 
-  cartItems CartItem[]
-  lineItems lineItem[]
+  cartItems            CartItem[]
+  lineItems            LineItem[]
+  openCheckoutSessions OpenCheckoutSessions[]
 }
 
 model Order {
-  id        Int      @id @default(autoincrement())
-  userId    String?
-  email     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  userId      String?
+  guestUserId String?
+  email       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   orderNumber String @unique
 
@@ -175,12 +177,13 @@ model Order {
   shippingMethod ShippingMethod @default(STANDARD)
   orderStatus    OrderStatus    @default(PROCESSING)
 
-  lineItems      lineItem[]
+  lineItems      LineItem[]
   User           User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guestUser      GuestUser?       @relation(fields: [guestUserId], references: [id], onDelete: SetNull)
   ViewOrderToken ViewOrderToken[]
 }
 
-model lineItem {
+model LineItem {
   id Int @id @default(autoincrement())
 
   pricePerUnitInCents Int
@@ -198,9 +201,10 @@ model lineItem {
 }
 
 model ShippingAddress {
-  id     Int     @id @default(autoincrement())
-  userId String?
-  email  String
+  id          Int     @id @default(autoincrement())
+  userId      String?
+  guestUserId String?
+  email       String
 
   recipientName String?
   addressLine1  String?
@@ -213,8 +217,9 @@ model ShippingAddress {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Order Order[]
-  User  User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  Order     Order[]
+  User      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  GuestUser GuestUser? @relation(fields: [guestUserId], references: [id])
 }
 
 model ViewOrderToken {
@@ -226,4 +231,26 @@ model ViewOrderToken {
   Order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@unique([orderId, token])
+}
+
+model OpenCheckoutSessions {
+  id Int @id @default(autoincrement())
+
+  createdAt               DateTime @default(now())
+  stripeCheckoutSessionId String   @unique
+
+  products Product[]
+}
+
+model GuestUser {
+  id String @id @default(uuid())
+
+  stripeCustomerId String @unique
+  email            String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shippingAddresses ShippingAddress[]
+  orders            Order[]
 }
