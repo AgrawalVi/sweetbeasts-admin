@@ -33,9 +33,15 @@ enum ShippingMethod {
   EXPEDITED
 }
 
+enum ContactUsStatus {
+  OPEN
+  CLAIMED
+}
+
 model User {
   id                    String                 @id @default(cuid())
-  name                  String?
+  firstName             String
+  lastName              String
   email                 String                 @unique
   emailVerified         DateTime?
   image                 String?
@@ -52,9 +58,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  cartItems       CartItem[]
-  ShippingAddress ShippingAddress[]
-  Order           Order[]
+  cartItems        CartItem[]
+  ShippingAddress  ShippingAddress[]
+  Order            Order[]
+  userSubmissions  ContactUsSubmission[] @relation("SubmittedByUser")
+  claimSubmissions ContactUsSubmission[] @relation("ClaimedByUser")
 }
 
 model Account {
@@ -194,8 +202,8 @@ model LineItem {
   productId Int
   quantity  Int
 
-  Order   Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  Product Product? @relation(fields: [productId], references: [id], onDelete: Restrict)
+  Order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  Product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
 
   orderId Int
 }
@@ -251,6 +259,31 @@ model GuestUser {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  shippingAddresses ShippingAddress[]
-  orders            Order[]
+  shippingAddresses   ShippingAddress[]
+  orders              Order[]
+  ContactUsSubmission ContactUsSubmission[]
+}
+
+model ContactUsSubmission {
+  id String @id @default(cuid())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  contactUsStatus ContactUsStatus @default(OPEN)
+
+  userId      String?
+  guestUserId String?
+
+  email String
+  name  String
+
+  claimedAt       DateTime?
+  claimedByUserId String?
+
+  claimedByUser User?      @relation("ClaimedByUser", fields: [claimedByUserId], references: [id], onDelete: SetNull)
+  user          User?      @relation("SubmittedByUser", fields: [userId], references: [id], onDelete: SetNull)
+  guestUser     GuestUser? @relation(fields: [guestUserId], references: [id], onDelete: SetNull)
+
+  message String[]
 }
