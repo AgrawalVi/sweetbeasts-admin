@@ -17,7 +17,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     return { error: 'Invalid Fields' }
   }
 
-  const { email, password, name } = validatedFields.data
+  const { email, password, firstName, lastName } = validatedFields.data
   const hashedPassword = await bcrypt.hash(password, 10)
 
   // make sure email is not taken
@@ -29,15 +29,17 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
 
   const stripeCustomer = await stripe.customers.create({
     email,
-    name,
+    name: `${firstName} ${lastName}`,
   })
 
   await db.user.create({
     data: {
-      name,
+      firstName,
+      lastName,
       email,
       password: hashedPassword,
       stripeCustomerId: stripeCustomer.id,
+      newsletterSubscribed: true,
     },
   })
 
