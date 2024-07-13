@@ -144,33 +144,80 @@ model CartItem {
   quantity  Int
   productId Int
 
-  user    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Product ProductVariant? @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([userId, productId]) // user can only have 1 product active at a time
   @@unique([guestId, productId]) // guest can only have 1 product active at a time
 }
 
 model Product {
-  id               Int      @id @default(autoincrement())
-  name             String   @unique
-  priceInCents     Int
-  description      String
-  stripeProductId  String   @unique
-  stripePriceId    String   @unique
-  primaryImagePath String?
-  productHref      String   @default("/products")
-  numSold          Int      @default(0)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  primaryVariantId Int @unique
+
+  active   Boolean @default(true)
+  archived Boolean @default(false)
+
+  variants       ProductVariant[] @relation("variants")
+  primaryVariant ProductVariant   @relation("primaryVariant", fields: [primaryVariantId], references: [id], onDelete: Restrict)
+}
+
+model ProductVariant {
+  id          Int    @id @default(autoincrement())
+  variantName String
+
+  description String
 
   inventory Int
+  numSold   Int @default(0)
 
   available Boolean @default(true)
+  archived  Boolean @default(false)
+
+  stripeProductId String @unique
+
+  parentProductId Int
+  parentProduct   Product  @relation("variants", fields: [parentProductId], references: [id], onDelete: Restrict)
+  product         Product? @relation("primaryVariant")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   cartItems            CartItem[]
   lineItems            LineItem[]
   openCheckoutSessions OpenCheckoutSessions[]
+
+  historicalPrices Price[] @relation("historicalPrices")
+  currentPriceId   Int     @unique
+  currentPrice     Price?  @relation("currentPrice")
+
+  @@unique([parentProductId, variantName])
+}
+
+model Price {
+  id Int @id @default(autoincrement())
+
+  priceInCents  Int
+  stripePriceId String @unique
+
+  shippingIncluded Boolean @default(false)
+  active           Boolean @default(true)
+
+  startDate DateTime  @default(now())
+  endDate   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  productId Int @unique
+
+  ProductVariant ProductVariant? @relation("historicalPrices", fields: [productId], references: [id], onDelete: Restrict)
+  Product        ProductVariant  @relation("currentPrice", fields: [id], references: [currentPriceId], onDelete: Restrict)
 }
 
 model Order {
@@ -220,8 +267,8 @@ model LineItem {
   productId Int
   quantity  Int
 
-  Order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  Product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  Order          Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productVariant ProductVariant @relation(fields: [productId], references: [id], onDelete: Restrict)
 
   orderId Int
 }
@@ -265,7 +312,7 @@ model OpenCheckoutSessions {
   createdAt               DateTime @default(now())
   stripeCheckoutSessionId String   @unique
 
-  products Product[]
+  products ProductVariant[]
 }
 
 model GuestUser {
