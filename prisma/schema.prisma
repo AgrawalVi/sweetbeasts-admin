@@ -62,7 +62,7 @@ model User {
   role                  UserRole               @default(CUSTOMER)
   accounts              Account[]
   isTwoFactorEnabled    Boolean                @default(false)
-  twoFactorConfirmation TwoFactorConfirmation?
+  TwoFactorConfirmation TwoFactorConfirmation?
 
   newsletterSubscribed Boolean @default(false)
 
@@ -71,11 +71,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  cartItems                CartItem[]
-  ShippingAddress          ShippingAddress[]
-  Order                    Order[]
-  contactUsUserSubmissions ContactUsSubmission[] @relation("SubmittedBy")
-  contactUsUserClaims      ContactUsSubmission[] @relation("ClaimedBy")
+  CartItem             CartItem[]
+  ShippingAddress      ShippingAddress[]
+  Order                Order[]
+  ContactUsSubmissions ContactUsSubmission[] @relation("SubmittedBy")
+  ContactUsUserClaims  ContactUsSubmission[] @relation("ClaimedBy")
 }
 
 model Account {
@@ -130,7 +130,7 @@ model TwoFactorConfirmation {
   id String @id @default(cuid())
 
   userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId])
 }
@@ -144,7 +144,7 @@ model CartItem {
   quantity  Int
   productId Int
 
-  user    User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User    User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
   Product ProductVariant? @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([userId, productId]) // user can only have 1 product active at a time
@@ -163,8 +163,8 @@ model Product {
   active   Boolean @default(true)
   archived Boolean @default(false)
 
-  variants       ProductVariant[] @relation("variants")
-  primaryVariant ProductVariant   @relation("primaryVariant", fields: [primaryVariantId], references: [id], onDelete: Restrict)
+  Variants       ProductVariant[] @relation("variants")
+  PrimaryVariant ProductVariant   @relation("primaryVariant", fields: [primaryVariantId], references: [id], onDelete: Restrict)
 }
 
 model ProductVariant {
@@ -182,8 +182,9 @@ model ProductVariant {
   stripeProductId String @unique
 
   parentProductId Int
-  parentProduct   Product  @relation("variants", fields: [parentProductId], references: [id], onDelete: Restrict)
-  product         Product? @relation("primaryVariant")
+
+  ParentProduct Product  @relation("variants", fields: [parentProductId], references: [id], onDelete: Restrict)
+  Product       Product? @relation("primaryVariant")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -192,9 +193,9 @@ model ProductVariant {
   lineItems            LineItem[]
   openCheckoutSessions OpenCheckoutSessions[]
 
-  historicalPrices Price[] @relation("historicalPrices")
+  HistoricalPrices Price[] @relation("historicalPrices")
   currentPriceId   Int     @unique
-  currentPrice     Price?  @relation("currentPrice")
+  CurrentPrice     Price?  @relation("currentPrice")
 
   @@unique([parentProductId, variantName])
 }
@@ -249,7 +250,7 @@ model Order {
   trackingUrl    String?
   courier        Courier?
 
-  lineItems           LineItem[]
+  LineItems           LineItem[]
   User                User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
   guestUser           GuestUser?            @relation(fields: [guestUserId], references: [id], onDelete: SetNull)
   ViewOrderToken      ViewOrderToken[]
@@ -268,7 +269,7 @@ model LineItem {
   quantity  Int
 
   Order          Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productVariant ProductVariant @relation(fields: [productId], references: [id], onDelete: Restrict)
+  ProductVariant ProductVariant @relation(fields: [productId], references: [id], onDelete: Restrict)
 
   orderId Int
 }
@@ -312,7 +313,7 @@ model OpenCheckoutSessions {
   createdAt               DateTime @default(now())
   stripeCheckoutSessionId String   @unique
 
-  products ProductVariant[]
+  Products ProductVariant[]
 }
 
 model GuestUser {
@@ -324,8 +325,8 @@ model GuestUser {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  shippingAddresses   ShippingAddress[]
-  orders              Order[]
+  ShippingAddresses   ShippingAddress[]
+  Orders              Order[]
   ContactUsSubmission ContactUsSubmission[]
 }
 
@@ -346,12 +347,12 @@ model ContactUsSubmission {
   claimedAt       DateTime?
   claimedByUserId String?
 
-  claimedByUser User?      @relation("ClaimedBy", fields: [claimedByUserId], references: [id], onDelete: SetNull)
-  user          User?      @relation("SubmittedBy", fields: [userId], references: [id], onDelete: SetNull)
-  guestUser     GuestUser? @relation(fields: [guestUserId], references: [id], onDelete: SetNull)
+  ClaimedByUser User?      @relation("ClaimedBy", fields: [claimedByUserId], references: [id], onDelete: SetNull)
+  User          User?      @relation("SubmittedBy", fields: [userId], references: [id], onDelete: SetNull)
+  GuestUser     GuestUser? @relation(fields: [guestUserId], references: [id], onDelete: SetNull)
 
   orderId Int?
-  order   Order? @relation(fields: [orderId], references: [id])
+  Order   Order? @relation(fields: [orderId], references: [id])
 
   contactUsType ContactUsType
 
