@@ -158,13 +158,12 @@ model Product {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  primaryVariantId Int @unique
-
   active   Boolean @default(true)
   archived Boolean @default(false)
 
-  Variants       ProductVariant[] @relation("variants")
-  PrimaryVariant ProductVariant   @relation("primaryVariant", fields: [primaryVariantId], references: [id], onDelete: Restrict)
+  primaryVariantId Int              @unique
+  Variants         ProductVariant[] @relation("variants")
+  PrimaryVariant   ProductVariant   @relation("primaryVariant", fields: [primaryVariantId], references: [id])
 }
 
 model ProductVariant {
@@ -182,20 +181,19 @@ model ProductVariant {
   stripeProductId String @unique
 
   parentProductId Int
-
-  ParentProduct Product  @relation("variants", fields: [parentProductId], references: [id], onDelete: Restrict)
-  Product       Product? @relation("primaryVariant")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  ParentProduct   Product  @relation("variants", fields: [parentProductId], references: [id], onDelete: Restrict)
+  Product         Product? @relation("primaryVariant")
 
   cartItems            CartItem[]
   lineItems            LineItem[]
   openCheckoutSessions OpenCheckoutSessions[]
 
-  HistoricalPrices Price[] @relation("historicalPrices")
   currentPriceId   Int     @unique
-  CurrentPrice     Price?  @relation("currentPrice")
+  HistoricalPrices Price[] @relation("historicalPrices")
+  CurrentPrice     Price   @relation(fields: [currentPriceId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([parentProductId, variantName])
 }
@@ -215,10 +213,10 @@ model Price {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  productId Int @unique
+  productId Int
 
-  ProductVariant ProductVariant? @relation("historicalPrices", fields: [productId], references: [id], onDelete: Restrict)
-  Product        ProductVariant  @relation("currentPrice", fields: [id], references: [currentPriceId], onDelete: Restrict)
+  ProductVariant ProductVariant  @relation("historicalPrices", fields: [productId], references: [id], onDelete: Restrict)
+  Product        ProductVariant?
 }
 
 model Order {
