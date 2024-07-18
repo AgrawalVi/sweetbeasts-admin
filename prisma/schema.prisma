@@ -51,6 +51,12 @@ enum ContactUsType {
   SUPPORT
 }
 
+enum OrderReturnStatus {
+  INITIATED
+  APPROVED
+  REJECTED
+}
+
 model User {
   id                    String                 @id @default(cuid())
   firstName             String
@@ -76,6 +82,7 @@ model User {
   Order                    Order[]
   contactUsUserSubmissions ContactUsSubmission[] @relation("SubmittedBy")
   contactUsUserClaims      ContactUsSubmission[] @relation("ClaimedBy")
+  LineItem                 LineItem[]
 }
 
 model Account {
@@ -158,7 +165,7 @@ model Product {
   description      String
   stripeProductId  String   @unique
   stripePriceId    String   @unique
-  primaryImagePath String?
+  primaryImagePath String
   productHref      String   @default("/products")
   numSold          Int      @default(0)
   createdAt        DateTime @default(now())
@@ -198,9 +205,16 @@ model Order {
   shippingMethod ShippingMethod @default(STANDARD)
   orderStatus    OrderStatus    @default(PROCESSING)
 
-  trackingNumber String?
-  trackingUrl    String?
-  courier        Courier?
+  trackingNumber   String?
+  trackingUrl      String?
+  courier          Courier?
+  orderShippedDate DateTime?
+
+  orderCancelledDate DateTime?
+  orderDeliveredDate DateTime?
+
+  orderExceptionDate    DateTime?
+  orderExceptionMessage String?
 
   lineItems           LineItem[]
   User                User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -220,6 +234,15 @@ model LineItem {
   productId Int
   quantity  Int
 
+  returnQuantity         Int?
+  returnReason           String?
+  returnStatus           OrderReturnStatus?
+  returnInitiatedDate    DateTime?
+  returnApprovedDate     DateTime?
+  returnRejectedDate     DateTime?
+  returnApprovedByUserId String?
+
+  User    User?   @relation(fields: [returnApprovedByUserId], references: [id], onDelete: SetNull)
   Order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   Product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
 
