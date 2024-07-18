@@ -67,6 +67,7 @@ export const createProduct = async (
           stripeProductId: stripeProduct.id,
           stripePriceId: stripeProduct.default_price as string,
           available: available === 'true' ? true : false,
+          primaryImagePath: '/placeholder.png',
         },
       })
     } catch (e) {
