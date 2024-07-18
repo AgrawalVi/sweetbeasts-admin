@@ -28,26 +28,54 @@ enum OrderStatus {
   RETURNED
 }
 
+enum ShippingMethod {
+  STANDARD
+  EXPEDITED
+}
+
+enum Courier {
+  UPS
+  USPS
+  FEDEX
+  DHL
+}
+
+enum ContactUsStatus {
+  OPEN
+  CLAIMED
+  RESOLVED
+}
+
+enum ContactUsType {
+  FEEDBACK
+  SUPPORT
+}
+
 model User {
   id                    String                 @id @default(cuid())
-  name                  String?
+  firstName             String
+  lastName              String
   email                 String                 @unique
   emailVerified         DateTime?
   image                 String?
-  password              String?
+  password              String
   role                  UserRole               @default(CUSTOMER)
   accounts              Account[]
   isTwoFactorEnabled    Boolean                @default(false)
   twoFactorConfirmation TwoFactorConfirmation?
 
-  stripeCustomerId String? @unique
+  newsletterSubscribed Boolean @default(false)
+
+  stripeCustomerId String @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  cartItems       CartItem[]
-  ShippingAddress ShippingAddress[]
-  Order           Order[]
+  cartItems                CartItem[]
+  ShippingAddress          ShippingAddress[]
+  Order                    Order[]
+  contactUsUserSubmissions ContactUsSubmission[] @relation("SubmittedBy")
+  contactUsUserClaims      ContactUsSubmission[] @relation("ClaimedBy")
 }
 
 model Account {
@@ -131,25 +159,29 @@ model Product {
   stripeProductId  String   @unique
   stripePriceId    String   @unique
   primaryImagePath String?
+  productHref      String   @default("/products")
   numSold          Int      @default(0)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  inventory    Int
-  numAvailable Int
+  inventory Int
 
   available Boolean @default(true)
 
-  cartItems CartItem[]
-  lineItems lineItem[]
+  cartItems            CartItem[]
+  lineItems            LineItem[]
+  openCheckoutSessions OpenCheckoutSessions[]
 }
 
 model Order {
-  id        Int      @id @default(autoincrement())
-  userId    String?
-  email     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  userId      String?
+  guestUserId String?
+  email       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderNumber String @unique
 
   stripeOrderId    String @unique
   stripeCustomerId String
@@ -157,15 +189,29 @@ model Order {
   shippingAddressId Int
   ShippingAddress   ShippingAddress @relation(fields: [shippingAddressId], references: [id], onDelete: Restrict)
 
-  pricePaidInCents Int
-  orderStatus      OrderStatus @default(PROCESSING)
+  couponId String?
 
-  lineItems lineItem[]
-  User      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  totalPaidInCents    Int
+  taxesPaidInCents    Int?
+  shippingPaidInCents Int?
+
+  shippingMethod ShippingMethod @default(STANDARD)
+  orderStatus    OrderStatus    @default(PROCESSING)
+
+  trackingNumber String?
+  trackingUrl    String?
+  courier        Courier?
+
+  lineItems           LineItem[]
+  User                User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guestUser           GuestUser?            @relation(fields: [guestUserId], references: [id], onDelete: SetNull)
+  ViewOrderToken      ViewOrderToken[]
+  ContactUsSubmission ContactUsSubmission[]
 }
 
-model lineItem {
-  id                  Int @id @default(autoincrement())
+model LineItem {
+  id Int @id @default(autoincrement())
+
   pricePerUnitInCents Int
 
   createdAt DateTime @default(now())
@@ -174,16 +220,17 @@ model lineItem {
   productId Int
   quantity  Int
 
-  Order   Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  Product Product? @relation(fields: [productId], references: [id], onDelete: Restrict)
+  Order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  Product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
 
   orderId Int
 }
 
 model ShippingAddress {
-  id     Int     @id @default(autoincrement())
-  userId String?
-  email  String
+  id          Int     @id @default(autoincrement())
+  userId      String?
+  guestUserId String?
+  email       String
 
   recipientName String?
   addressLine1  String?
@@ -196,6 +243,70 @@ model ShippingAddress {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Order Order[]
-  User  User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  Order     Order[]
+  User      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  GuestUser GuestUser? @relation(fields: [guestUserId], references: [id])
+}
+
+model ViewOrderToken {
+  id      String   @id @default(cuid())
+  orderId Int
+  token   String   @unique
+  expires DateTime
+
+  Order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, token])
+}
+
+model OpenCheckoutSessions {
+  id Int @id @default(autoincrement())
+
+  createdAt               DateTime @default(now())
+  stripeCheckoutSessionId String   @unique
+
+  products Product[]
+}
+
+model GuestUser {
+  id String @id @default(uuid())
+
+  stripeCustomerId String @unique
+  email            String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shippingAddresses   ShippingAddress[]
+  orders              Order[]
+  ContactUsSubmission ContactUsSubmission[]
+}
+
+model ContactUsSubmission {
+  id String @id @default(cuid())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  contactUsStatus ContactUsStatus @default(OPEN)
+
+  userId      String?
+  guestUserId String?
+
+  email String
+  name  String
+
+  claimedAt       DateTime?
+  claimedByUserId String?
+
+  claimedByUser User?      @relation("ClaimedBy", fields: [claimedByUserId], references: [id], onDelete: SetNull)
+  user          User?      @relation("SubmittedBy", fields: [userId], references: [id], onDelete: SetNull)
+  guestUser     GuestUser? @relation(fields: [guestUserId], references: [id], onDelete: SetNull)
+
+  orderId Int?
+  order   Order? @relation(fields: [orderId], references: [id])
+
+  contactUsType ContactUsType
+
+  message String[]
 }
