@@ -11,18 +11,18 @@ export const orderTableColumns: ColumnDef<OrderWithData>[] = [
     accessorKey: 'ShippingAddress.recipientName',
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Customer" />
-    }
+    },
   },
   {
-    accessorKey: "orderNumber",
+    accessorKey: 'orderNumber',
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Order Number" />
-    }
+    },
   },
   {
-    accessorKey: "orderStatus",
+    accessorKey: 'orderStatus',
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Status" />
-    }
+    },
   },
 ]

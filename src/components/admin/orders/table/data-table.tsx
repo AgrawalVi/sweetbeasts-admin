@@ -9,16 +9,23 @@ import {
   getPaginationRowModel,
   getFilteredRowModel,
   SortingState,
-  ColumnDef
-} from "@tanstack/react-table";
+  ColumnDef,
+} from '@tanstack/react-table'
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { DataTableFacetedFilter } from "@/components/ui/data-table-faceted-filter";
-import { DataTablePagination } from "@/components/ui/data-table-pagination";
-import { OrderWithData } from "@/types";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { useState } from 'react'
+import { DataTableFacetedFilter } from '@/components/ui/data-table-faceted-filter'
+import { DataTablePagination } from '@/components/ui/data-table-pagination'
+import { OrderWithData } from '@/types'
 
 interface OrdersDataTableProps {
   columns: ColumnDef<OrderWithData>[]
@@ -84,9 +91,9 @@ export function OrdersDataTable({ columns, data }: OrdersDataTableProps) {
                           {header.isPlaceholder
                             ? null
                             : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
                         </TableHead>
                       )
                     })}
@@ -133,6 +140,4 @@ export function OrdersDataTable({ columns, data }: OrdersDataTableProps) {
       </div>
     </div>
   )
-
-
 }
