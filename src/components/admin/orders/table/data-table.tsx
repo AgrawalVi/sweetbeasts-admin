@@ -58,15 +58,14 @@ export function OrdersDataTable({ columns, data }: OrdersDataTableProps) {
           <div className="flex w-full items-end justify-between gap-2">
             <div className="flex flex-1 flex-col-reverse items-start gap-2 md:flex-row">
               <Input
-                placeholder="Search Companies..."
+                placeholder="Search Customer..."
                 value={
-                  (table
-                    .getColumn('companyName')
-                    ?.getFilterValue() as string) ?? ''
+                  (table.getColumn('customer')?.getFilterValue() as string) ??
+                  ''
                 }
                 onChange={(event) =>
                   table
-                    .getColumn('companyName')
+                    .getColumn('customer')
                     ?.setFilterValue(event.target.value)
                 }
                 className="max-w-sm"
