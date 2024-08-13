@@ -1,7 +1,15 @@
 import { currentUser } from '@/lib/auth'
+import { getAllOrders } from "@/data/admin/orders";
+import { orderTableColumns } from "@/components/admin/orders/table/columns";
+import { OrdersDataTable } from "@/components/admin/orders/table/data-table";
 
 export default async function Orders() {
-  const user = await currentUser()
 
-  return <div>{JSON.stringify(user)}</div>
+  const orders = await getAllOrders()
+
+  if (!orders || orders.length === 0) {
+    return null
+  }
+
+  return <OrdersDataTable columns={orderTableColumns} data={orders} />
 }
