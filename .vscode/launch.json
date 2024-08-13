@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "dev",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev"
+    },
+    {
+      "name": "prisma studio",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npx prisma studio"
+    },
+    {
+      "name": "build",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run build"
+    },
+    {
+      "name": "pretty",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run pretty"
+    }
+  ]
+}
