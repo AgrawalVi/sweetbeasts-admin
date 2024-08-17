@@ -71,6 +71,7 @@
     "react-spinners": "^0.13.8",
     "resend": "^3.2.0",
     "server-only": "^0.0.1",
+    "shippo": "^2.6.1",
     "sonner": "^1.4.41",
     "stripe": "^15.8.0",
     "superjson": "^2.2.1",

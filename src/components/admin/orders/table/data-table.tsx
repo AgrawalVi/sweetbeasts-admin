@@ -26,6 +26,7 @@ import { useState } from 'react'
 import { DataTableFacetedFilter } from '@/components/ui/data-table-faceted-filter'
 import { DataTablePagination } from '@/components/ui/data-table-pagination'
 import { OrderWithData } from '@/types'
+import { shipOrder } from '@/actions/orders/ship-order'
 
 interface OrdersDataTableProps {
   columns: ColumnDef<OrderWithData>[]
@@ -35,6 +36,18 @@ interface OrdersDataTableProps {
 export function OrdersDataTable({ columns, data }: OrdersDataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+
+  const shipOrderButton = async () => {
+    console.log('shipping order')
+    shipOrder(1, 1, {
+      height: '10',
+      width: '10',
+      length: '10',
+      distanceUnit: 'in',
+      massUnit: 'lb',
+      weight: '3',
+    })
+  }
 
   const table = useReactTable({
     data,
@@ -53,6 +66,7 @@ export function OrdersDataTable({ columns, data }: OrdersDataTableProps) {
 
   return (
     <div className="flex w-full justify-center">
+      <Button onClick={shipOrderButton}>Ship Order</Button>
       <div className="flex max-w-screen-2xl flex-col items-start gap-4 p-5 lg:grid lg:grid-cols-5 xl:grid-cols-3">
         <div className="w-full space-y-2 lg:col-span-3 xl:col-span-2">
           <div className="flex w-full items-end justify-between gap-2">

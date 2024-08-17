@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -31,13 +28,6 @@ enum OrderStatus {
 enum ShippingMethod {
   STANDARD
   EXPEDITED
-}
-
-enum Courier {
-  UPS
-  USPS
-  FEDEX
-  DHL
 }
 
 enum ContactUsStatus {
@@ -205,9 +195,14 @@ model Order {
   shippingMethod ShippingMethod @default(STANDARD)
   orderStatus    OrderStatus    @default(PROCESSING)
 
-  trackingNumber   String?
-  trackingUrl      String?
-  courier          Courier?
+  labelUrl        String?
+  shippoLabelId   String?
+  courier         String?
+  shippingService String?
+
+  trackingNumber String?
+  trackingUrl    String?
+
   orderShippedDate DateTime?
 
   orderCancelledDate DateTime?
@@ -266,9 +261,10 @@ model ShippingAddress {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Order     Order[]
-  User      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
-  GuestUser GuestUser? @relation(fields: [guestUserId], references: [id])
+  Order                 Order[]
+  User                  User?                   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  GuestUser             GuestUser?              @relation(fields: [guestUserId], references: [id])
+  ShippingFromAddresses ShippingFromAddresses[]
 }
 
 model ViewOrderToken {
@@ -332,4 +328,28 @@ model ContactUsSubmission {
   contactUsType ContactUsType
 
   message String[]
+}
+
+model ShippingFromAddresses {
+  id Int @id @default(autoincrement())
+
+  name String @unique
+
+  shippingAddressId Int
+  shippingAddress   ShippingAddress @relation(fields: [shippingAddressId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Boxes {
+  id Int @id @default(autoincrement())
+
+  // in inches
+  heightInInches Int
+  widthInInches  Int
+  depthInInches  Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
