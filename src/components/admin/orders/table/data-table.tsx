@@ -39,7 +39,7 @@ export function OrdersDataTable({ columns, data }: OrdersDataTableProps) {
 
   const shipOrderButton = async () => {
     console.log('shipping order')
-    shipOrder(1, 1, {
+    const result = await shipOrder(1, 1, {
       height: '10',
       width: '10',
       length: '10',
@@ -47,6 +47,7 @@ export function OrdersDataTable({ columns, data }: OrdersDataTableProps) {
       massUnit: 'lb',
       weight: '3',
     })
+    console.log(result)
   }
 
   const table = useReactTable({

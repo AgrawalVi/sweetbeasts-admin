@@ -9,10 +9,9 @@ import {
   LabelFileTypeEnum,
   ParcelCreateRequest,
   ServiceLevelUPSEnum,
-  ServiceLevelUSPSEnum,
-  ShipmentCreateRequest,
 } from 'shippo'
 import { fromAddressEmail } from '@/constants'
+import { shipOrder as shipOrderDb } from '@/data/admin/orders'
 
 const UPSKey = process.env.SHIPPO_UPS_KEY!
 
@@ -79,6 +78,8 @@ export const shipOrder = async (
     }
   }
 
+  // console.log('shipment', shipment)
+
   if (!shipment) {
     return {
       error: 'Failed to ship order',
@@ -107,6 +108,7 @@ export const shipOrder = async (
     transaction = await shippo.transactions.create({
       rate: rate.objectId,
       labelFileType: LabelFileTypeEnum.Pdf,
+      async: false,
     })
   } catch (e) {
     console.log(e)
@@ -115,7 +117,7 @@ export const shipOrder = async (
     }
   }
 
-  if (!transaction) {
+  if (!transaction || transaction.status !== 'SUCCESS') {
     return {
       error: 'Failed to create transaction',
     }
@@ -124,6 +126,21 @@ export const shipOrder = async (
   console.log('transaction', transaction)
 
   // TODO: Update order with data
+  const shippedOrder = await shipOrderDb(
+    orderId,
+    transaction.objectId,
+    transaction.labelUrl,
+    rate.provider,
+    rate.servicelevel.name,
+    transaction.trackingNumber,
+    transaction.trackingUrlProvider,
+  )
+
+  if (!shippedOrder) {
+    return {
+      error: 'Failed to update with tracking information',
+    }
+  }
 
   // TODO: send email to customer
 }

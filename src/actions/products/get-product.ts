@@ -23,7 +23,6 @@ export const getAllProducts = async () => {
     if (!products) {
       return { error: 'No products found' }
     }
-    console.log('products', products)
     return { success: products }
   } catch (e) {
     return { error: 'Error: ' + e }
