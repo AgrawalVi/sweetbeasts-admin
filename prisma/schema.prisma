@@ -155,30 +155,38 @@ model Product {
   id   Int    @id @default(autoincrement())
   name String @unique
 
+  active   Boolean @default(false)
+  archived Boolean @default(false)
+
+  productHref         String?
+  primaryProductImage String?
+
+  description String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  active   Boolean @default(true)
-  archived Boolean @default(false)
-
-  primaryVariantId Int              @unique
+  primaryVariantId Int?             @unique
   Variants         ProductVariant[] @relation("variants")
-  PrimaryVariant   ProductVariant   @relation("primaryVariant", fields: [primaryVariantId], references: [id])
+  PrimaryVariant   ProductVariant?  @relation("primaryVariant", fields: [primaryVariantId], references: [id])
 }
 
 model ProductVariant {
-  id          Int    @id @default(autoincrement())
-  variantName String
+  id Int @id @default(autoincrement())
 
-  description String
+  variantProductName String  @unique
+  variantKey         String?
+  variantDescription String?
 
   inventory Int
   numSold   Int @default(0)
 
-  available Boolean @default(true)
+  available Boolean @default(false)
   archived  Boolean @default(false)
 
   stripeProductId String @unique
+
+  imageHref String?
 
   parentProductId Int
   ParentProduct   Product  @relation("variants", fields: [parentProductId], references: [id], onDelete: Restrict)
@@ -187,15 +195,12 @@ model ProductVariant {
   cartItems            CartItem[]
   lineItems            LineItem[]
   openCheckoutSessions OpenCheckoutSessions[]
-
-  currentPriceId   Int     @unique
-  HistoricalPrices Price[] @relation("historicalPrices")
-  CurrentPrice     Price   @relation(fields: [currentPriceId], references: [id])
+  prices               Price[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([parentProductId, variantName])
+  @@unique([parentProductId, variantKey])
 }
 
 model Price {
@@ -207,16 +212,13 @@ model Price {
   shippingIncluded Boolean @default(false)
   active           Boolean @default(true)
 
-  startDate DateTime  @default(now())
-  endDate   DateTime?
+  startDate        DateTime       @default(now())
+  endDate          DateTime?
+  productVariantId Int
+  ProductVariant   ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Restrict)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  productId Int
-
-  ProductVariant ProductVariant  @relation("historicalPrices", fields: [productId], references: [id], onDelete: Restrict)
-  Product        ProductVariant?
 }
 
 model Order {

@@ -8,6 +8,7 @@ import { CreateProductSchema } from '@/schemas'
 import { getProductByName } from '@/data/admin/products'
 import { currentRole } from '@/lib/auth'
 import { UserRole } from '@prisma/client'
+import { create } from 'domain'
 
 export const createProduct = async (
   values: z.infer<typeof CreateProductSchema>,
@@ -56,23 +57,40 @@ export const createProduct = async (
   }
   console.log('stripeProduct', stripeProduct)
 
-  if (stripeProduct) {
-    try {
-      await db.product.create({
+  if (!stripeProduct) {
+    return { error: 'Failed to create product in stripe' }
+  }
+
+  let rootProduct, variant, price
+  try {
+    await db.$transaction(async (tx) => {
+      rootProduct = await tx.product.create({
         data: {
           name,
           description,
-          priceInCents,
-          inventory: quantity,
-          stripeProductId: stripeProduct.id,
-          stripePriceId: stripeProduct.default_price as string,
-          available: available === 'true' ? true : false,
         },
       })
-    } catch (e) {
-      console.log(e)
-      return { error: 'Failed to create product' }
-    }
+      variant = await tx.productVariant.create({
+        data: {
+          variantProductName: name,
+          variantDescription: description,
+          inventory: quantity,
+          stripeProductId: stripeProduct.id,
+          parentProductId: rootProduct.id,
+        },
+      })
+      price = await tx.price.create({
+        data: {
+          priceInCents,
+          shippingIncluded: true,
+          stripePriceId: stripeProduct.default_price as string,
+          productVariantId: variant.id,
+        },
+      })
+    })
+  } catch (e) {
+    console.log(e)
+    return { error: 'Failed to create product' }
   }
 
   return { success: 'Product created successfully' }
