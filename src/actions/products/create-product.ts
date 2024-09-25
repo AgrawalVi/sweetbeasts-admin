@@ -4,7 +4,7 @@ import * as z from 'zod'
 import { db } from '@/lib/db'
 import { stripe } from '@/lib/stripe'
 import { CreateProductSchema } from '@/schemas'
-import { getProductByName } from '@/data/admin/products'
+import { getRootProductWithVariantsByName } from '@/data/admin/products'
 import { currentRole } from '@/lib/auth'
 import { UserRole } from '@prisma/client'
 
@@ -30,7 +30,7 @@ export const createProduct = async (
   const { name, quantity, priceInCents, description, available } =
     validatedFields.data
 
-  const existingProduct = await getProductByName(name)
+  const existingProduct = await getRootProductWithVariantsByName(name)
 
   if (existingProduct) {
     return { error: 'Product with this name already exists' }

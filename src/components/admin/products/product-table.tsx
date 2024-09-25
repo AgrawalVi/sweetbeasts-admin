@@ -36,7 +36,6 @@ import {
 } from '@/components/ui/table'
 
 import { Product } from '@prisma/client'
-import { getAllProducts } from '@/actions/products/get-product'
 import EditProductButton from './edit-product-button'
 
 import { useQuery } from '@tanstack/react-query'
