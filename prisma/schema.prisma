@@ -166,9 +166,7 @@ model Product {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  primaryVariantId Int?             @unique
-  Variants         ProductVariant[] @relation("variants")
-  PrimaryVariant   ProductVariant?  @relation("primaryVariant", fields: [primaryVariantId], references: [id])
+  Variants ProductVariant[] @relation("variants")
 }
 
 model ProductVariant {
@@ -177,6 +175,7 @@ model ProductVariant {
   variantProductName String  @unique
   variantKey         String?
   variantDescription String?
+  primaryVariant     Boolean @default(false)
 
   inventory Int
   numSold   Int @default(0)
@@ -189,36 +188,21 @@ model ProductVariant {
   imageHref String?
 
   parentProductId Int
-  ParentProduct   Product  @relation("variants", fields: [parentProductId], references: [id], onDelete: Restrict)
-  Product         Product? @relation("primaryVariant")
+  ParentProduct   Product @relation("variants", fields: [parentProductId], references: [id], onDelete: Restrict)
 
   cartItems            CartItem[]
   lineItems            LineItem[]
   openCheckoutSessions OpenCheckoutSessions[]
-  prices               Price[]
+
+  priceInCents  Int
+  stripePriceId String
+
+  shippingIncluded Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([parentProductId, variantKey])
-}
-
-model Price {
-  id Int @id @default(autoincrement())
-
-  priceInCents  Int
-  stripePriceId String @unique
-
-  shippingIncluded Boolean @default(false)
-  active           Boolean @default(true)
-
-  startDate        DateTime       @default(now())
-  endDate          DateTime?
-  productVariantId Int
-  ProductVariant   ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Restrict)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Order {

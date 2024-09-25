@@ -77,14 +77,9 @@ export const createProduct = async (
           inventory: quantity,
           stripeProductId: stripeProduct.id,
           parentProductId: rootProduct.id,
-        },
-      })
-      price = await tx.price.create({
-        data: {
           priceInCents,
-          shippingIncluded: true,
           stripePriceId: stripeProduct.default_price as string,
-          productVariantId: variant.id,
+          primaryVariant: true,
         },
       })
     })

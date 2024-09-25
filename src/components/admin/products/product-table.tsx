@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react'
 import {
   ColumnDef,
@@ -39,6 +41,7 @@ import EditProductButton from './edit-product-button'
 
 import { useQuery } from '@tanstack/react-query'
 import DeleteProductButton from './delete-product-button'
+import { ProductWithData } from '@/types'
 
 // Update columns to match the new data structure
 export const columns: ColumnDef<Product>[] = [
@@ -142,18 +145,11 @@ export const columns: ColumnDef<Product>[] = [
   },
 ]
 
-export default function ProductTable() {
-  const { data, isError, isPending } = useQuery({
-    queryKey: ['all-products'],
-    queryFn: async () => {
-      const response = await getAllProducts()
-      if (response.success) {
-        return response.success
-      }
-      throw new Error(response.error)
-    },
-  })
-
+export default function ProductTable({
+  products,
+}: {
+  products: ProductWithData[] | null
+}) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -163,7 +159,7 @@ export default function ProductTable() {
   const [rowSelection, setRowSelection] = React.useState({})
 
   const table = useReactTable({
-    data: data ? data : [],
+    data: products ? products : [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -180,14 +176,6 @@ export default function ProductTable() {
       rowSelection,
     },
   })
-
-  if (isPending) {
-    return <div>Loading...</div>
-  }
-
-  if (isError) {
-    return <div>An unknown error has occurred</div>
-  }
 
   return (
     <div className="w-full">

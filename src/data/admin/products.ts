@@ -1,3 +1,5 @@
+import 'server-only'
+
 import { db } from '@/lib/db'
 
 export async function getProductByName(name: string) {
@@ -28,7 +30,11 @@ export async function getProductById(id: number) {
 
 export async function getAllProducts() {
   try {
-    const products = await db.product.findMany()
+    const products = await db.product.findMany({
+      include: {
+        Variants: true,
+      },
+    })
     return products
   } catch {
     return null
