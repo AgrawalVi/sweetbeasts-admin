@@ -195,7 +195,7 @@ model ProductVariant {
   openCheckoutSessions OpenCheckoutSessions[]
 
   priceInCents  Int
-  stripePriceId String
+  stripePriceId String @unique
 
   shippingIncluded Boolean @default(false)
 
