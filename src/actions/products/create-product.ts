@@ -1,14 +1,12 @@
 'use server'
 
 import * as z from 'zod'
-
 import { db } from '@/lib/db'
 import { stripe } from '@/lib/stripe'
 import { CreateProductSchema } from '@/schemas'
 import { getProductByName } from '@/data/admin/products'
 import { currentRole } from '@/lib/auth'
 import { UserRole } from '@prisma/client'
-import { create } from 'domain'
 
 export const createProduct = async (
   values: z.infer<typeof CreateProductSchema>,
@@ -23,7 +21,6 @@ export const createProduct = async (
     }
   }
 
-  console.log(values)
   const validatedFields = CreateProductSchema.safeParse(values)
 
   if (!validatedFields.success) {
@@ -39,14 +36,16 @@ export const createProduct = async (
     return { error: 'Product with this name already exists' }
   }
 
+  // create the product in stripe
   let stripeProduct = null
   try {
     stripeProduct = await stripe.products.create({
       name,
       description,
-      active: available === 'true' ? true : false,
+      active: available === 'true',
       shippable: true,
-      url: `https://sweetbeasts.shop/products/${name}`,
+      // make sure there's no spaces in the url
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/products/${name.split(' ').join('-')}`,
       default_price_data: {
         currency: 'usd',
         unit_amount: priceInCents,
@@ -55,12 +54,12 @@ export const createProduct = async (
   } catch {
     return { error: 'Failed to create product in stripe' }
   }
-  console.log('stripeProduct', stripeProduct)
 
   if (!stripeProduct) {
     return { error: 'Failed to create product in stripe' }
   }
 
+  // transaction to create the product and its variants
   let rootProduct, variant, price
   try {
     await db.$transaction(async (tx) => {
