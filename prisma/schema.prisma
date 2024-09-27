@@ -71,11 +71,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  CartItem             CartItem[]
-  ShippingAddress      ShippingAddress[]
-  Order                Order[]
-  ContactUsSubmissions ContactUsSubmission[] @relation("SubmittedBy")
-  ContactUsUserClaims  ContactUsSubmission[] @relation("ClaimedBy")
+  cartItem             CartItem[]
+  shippingAddress      ShippingAddress[]
+  order                Order[]
+  contactUsSubmissions ContactUsSubmission[] @relation("SubmittedBy")
+  contactUsUserClaims  ContactUsSubmission[] @relation("ClaimedBy")
 }
 
 model Account {
@@ -130,7 +130,7 @@ model TwoFactorConfirmation {
   id String @id @default(cuid())
 
   userId String
-  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId])
 }
@@ -144,8 +144,8 @@ model CartItem {
   quantity  Int
   productId Int
 
-  User    User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Product ProductVariant? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product ProductVariant? @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([userId, productId]) // user can only have 1 product active at a time
   @@unique([guestId, productId]) // guest can only have 1 product active at a time
@@ -166,7 +166,7 @@ model Product {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Variants ProductVariant[] @relation("variants")
+  variants ProductVariant[] @relation("variants")
 }
 
 model ProductVariant {
@@ -188,7 +188,7 @@ model ProductVariant {
   imageHref String?
 
   parentProductId Int
-  ParentProduct   Product @relation("variants", fields: [parentProductId], references: [id], onDelete: Restrict)
+  parentProduct   Product @relation("variants", fields: [parentProductId], references: [id], onDelete: Restrict)
 
   cartItems            CartItem[]
   lineItems            LineItem[]
@@ -213,13 +213,14 @@ model Order {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  orderNumber String @unique
+  orderNumber    String @unique
+  viewOrderToken String @unique
 
   stripeOrderId    String @unique
   stripeCustomerId String
 
   shippingAddressId Int
-  ShippingAddress   ShippingAddress @relation(fields: [shippingAddressId], references: [id], onDelete: Restrict)
+  shippingAddress   ShippingAddress @relation(fields: [shippingAddressId], references: [id], onDelete: Restrict)
 
   couponId String?
 
@@ -234,11 +235,10 @@ model Order {
   trackingUrl    String?
   courier        Courier?
 
-  LineItems           LineItem[]
-  User                User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
+  lineItems           LineItem[]
+  user                User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
   guestUser           GuestUser?            @relation(fields: [guestUserId], references: [id], onDelete: SetNull)
-  ViewOrderToken      ViewOrderToken[]
-  ContactUsSubmission ContactUsSubmission[]
+  contactUsSubmission ContactUsSubmission[]
 }
 
 model LineItem {
@@ -252,8 +252,8 @@ model LineItem {
   productId Int
   quantity  Int
 
-  Order          Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  ProductVariant ProductVariant @relation(fields: [productId], references: [id], onDelete: Restrict)
+  order          Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productVariant ProductVariant @relation(fields: [productId], references: [id], onDelete: Restrict)
 
   orderId Int
 }
@@ -275,20 +275,9 @@ model ShippingAddress {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Order     Order[]
-  User      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
-  GuestUser GuestUser? @relation(fields: [guestUserId], references: [id])
-}
-
-model ViewOrderToken {
-  id      String   @id @default(cuid())
-  orderId Int
-  token   String   @unique
-  expires DateTime
-
-  Order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
-  @@unique([orderId, token])
+  order     Order[]
+  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guestUser GuestUser? @relation(fields: [guestUserId], references: [id])
 }
 
 model OpenCheckoutSessions {
@@ -297,7 +286,7 @@ model OpenCheckoutSessions {
   createdAt               DateTime @default(now())
   stripeCheckoutSessionId String   @unique
 
-  Products ProductVariant[]
+  products ProductVariant[]
 }
 
 model GuestUser {
@@ -309,9 +298,9 @@ model GuestUser {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  ShippingAddresses   ShippingAddress[]
-  Orders              Order[]
-  ContactUsSubmission ContactUsSubmission[]
+  shippingAddresses   ShippingAddress[]
+  orders              Order[]
+  contactUsSubmission ContactUsSubmission[]
 }
 
 model ContactUsSubmission {
@@ -331,12 +320,12 @@ model ContactUsSubmission {
   claimedAt       DateTime?
   claimedByUserId String?
 
-  ClaimedByUser User?      @relation("ClaimedBy", fields: [claimedByUserId], references: [id], onDelete: SetNull)
-  User          User?      @relation("SubmittedBy", fields: [userId], references: [id], onDelete: SetNull)
-  GuestUser     GuestUser? @relation(fields: [guestUserId], references: [id], onDelete: SetNull)
+  claimedByUser User?      @relation("ClaimedBy", fields: [claimedByUserId], references: [id], onDelete: SetNull)
+  user          User?      @relation("SubmittedBy", fields: [userId], references: [id], onDelete: SetNull)
+  guestUser     GuestUser? @relation(fields: [guestUserId], references: [id], onDelete: SetNull)
 
   orderId Int?
-  Order   Order? @relation(fields: [orderId], references: [id])
+  order   Order? @relation(fields: [orderId], references: [id])
 
   contactUsType ContactUsType
 
