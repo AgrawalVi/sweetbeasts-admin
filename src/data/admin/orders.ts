@@ -7,12 +7,14 @@ export async function getOrderWithDataById(orderId: number) {
         id: orderId,
       },
       include: {
-        ShippingAddress: true,
         lineItems: {
           include: {
-            Product: true,
+            productVariant: {
+              include: { parentProduct: true },
+            },
           },
         },
+        shippingAddress: true,
       },
     })
     return order
@@ -26,10 +28,12 @@ export async function getAllOrdersWithData() {
   try {
     const orders = await db.order.findMany({
       include: {
-        ShippingAddress: true,
+        shippingAddress: true,
         lineItems: {
           include: {
-            Product: true,
+            productVariant: {
+              include: { parentProduct: true },
+            },
           },
         },
       },

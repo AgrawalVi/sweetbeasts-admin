@@ -43,7 +43,7 @@ export const shipOrder = async (
     }
   }
 
-  const toAddress = order.ShippingAddress
+  const toAddress = order.shippingAddress
 
   let shipment
   try {

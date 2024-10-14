@@ -28,16 +28,15 @@ enum OrderStatus {
   RETURNED
 }
 
+enum OrderReturnStatus {
+  INITIATED
+  APPROVED
+  REJECTED
+}
+
 enum ShippingMethod {
   STANDARD
   EXPEDITED
-}
-
-enum Courier {
-  UPS
-  USPS
-  FEDEX
-  DHL
 }
 
 enum ContactUsStatus {
@@ -224,6 +223,11 @@ model Order {
 
   couponId String?
 
+  labelUrl        String?
+  shippoLabelId   String?
+  courier         String?
+  shippingService String?
+
   totalPaidInCents    Int
   taxesPaidInCents    Int?
   shippingPaidInCents Int?
@@ -231,9 +235,22 @@ model Order {
   shippingMethod ShippingMethod @default(STANDARD)
   orderStatus    OrderStatus    @default(PROCESSING)
 
+  orderShippedDate      DateTime?
+  orderCancelledDate    DateTime?
+  orderDeliveredDate    DateTime?
+  orderExceptionDate    DateTime?
+  orderExceptionMessage String?
+
+  returnQuantity         Int?
+  returnReason           String?
+  returnStatus           OrderReturnStatus?
+  returnInitiatedDate    DateTime?
+  returnApprovedDate     DateTime?
+  returnRejectedDate     DateTime?
+  returnApprovedByUserId String?
+
   trackingNumber String?
   trackingUrl    String?
-  courier        Courier?
 
   lineItems           LineItem[]
   user                User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -275,9 +292,10 @@ model ShippingAddress {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  order     Order[]
-  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
-  guestUser GuestUser? @relation(fields: [guestUserId], references: [id])
+  order                 Order[]
+  user                  User?                   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guestUser             GuestUser?              @relation(fields: [guestUserId], references: [id])
+  ShippingFromAddresses ShippingFromAddresses[]
 }
 
 model OpenCheckoutSessions {
@@ -330,4 +348,23 @@ model ContactUsSubmission {
   contactUsType ContactUsType
 
   message String[]
+}
+
+model ShippingFromAddresses {
+  id                Int             @id @default(autoincrement())
+  name              String          @unique
+  shippingAddressId Int
+  shippingAddress   ShippingAddress @relation(fields: [shippingAddressId], references: [id], onDelete: Restrict)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+}
+
+model Boxes {
+  id             Int      @id @default(autoincrement())
+  // in inches
+  heightInInches Int
+  widthInInches  Int
+  depthInInches  Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }

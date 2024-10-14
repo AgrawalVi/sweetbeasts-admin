@@ -7,7 +7,9 @@ import {
   ProductVariant
 } from '@prisma/client'
 
-export type LineItemWithProduct = LineItem & { Product: Product }
+export type LineItemWithProduct = LineItem & {
+  productVariant: ProductVariant & { parentProduct: Product }
+}
 
 export type GuestUserWithData = GuestUser & {
   shippingAddresses: ShippingAddress[]
@@ -23,7 +25,7 @@ export type stripeLineItemWithProductId = {
 export type OrderWithData = Order & {
   lineItems: LineItemWithProduct[] | null
 } & {
-  ShippingAddress: ShippingAddress
+  shippingAddress: ShippingAddress
 }
 
 export type ProductWithData = Product & {

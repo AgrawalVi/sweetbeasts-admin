@@ -8,7 +8,7 @@ import { DataTableColumnHeader } from '@/components/ui/data-table-column-header'
 
 export const orderTableColumns: ColumnDef<OrderWithData>[] = [
   {
-    accessorFn: (row) => [row.ShippingAddress.recipientName, row.email],
+    accessorFn: (row) => [row.shippingAddress.recipientName, row.email],
     id: 'customer',
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Customer" />
