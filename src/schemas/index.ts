@@ -127,8 +127,8 @@ export const CreateProductSchema = z.object({
     .number({
       message: 'Price must be a number',
     })
-    .gte(99, {
-      message: 'Price has to be greater than $0.99',
+    .gte(0, {
+      message: 'Price has to be greater or equal to than 0',
     }),
   quantity: z.coerce.number({
     message: 'Quantity must be a number',
