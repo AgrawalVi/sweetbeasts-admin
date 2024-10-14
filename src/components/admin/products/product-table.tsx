@@ -43,7 +43,7 @@ import DeleteProductButton from './delete-product-button'
 import { ProductWithData } from '@/types'
 
 // Update columns to match the new data structure
-export const columns: ColumnDef<Product>[] = [
+export const columns: ColumnDef<ProductWithData>[] = [
   {
     accessorKey: 'name',
     header: ({ column }) => (
@@ -116,7 +116,7 @@ export const columns: ColumnDef<Product>[] = [
 
       return (
         <div className="flex items-center justify-center space-x-2 px-4 py-2 text-center">
-          <EditProductButton product={product} />
+          <EditProductButton product={product.variants[0]} />
           <DeleteProductButton product={product} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

@@ -22,7 +22,7 @@ export async function getRootProductWithVariantsById(id: number) {
         id,
       },
       include: {
-        Variants: true,
+        variants: true,
       },
     })
   } catch (e) {
@@ -39,7 +39,7 @@ export async function getPrimaryProductVariantByRootProductId(id: number) {
         primaryVariant: true,
       },
       include: {
-        ParentProduct: true,
+        parentProduct: true,
       },
     })
   } catch (e) {
@@ -65,7 +65,7 @@ export async function getAllProducts() {
   try {
     const products = await db.product.findMany({
       include: {
-        Variants: true,
+        variants: true,
       },
     })
     return products
@@ -86,7 +86,7 @@ export async function getProductVariantByStripePriceId(
         stripePriceId,
       },
       include: {
-        ParentProduct: true,
+        parentProduct: true,
       },
     })
   } catch {

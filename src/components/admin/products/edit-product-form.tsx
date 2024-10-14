@@ -23,10 +23,11 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
-import { Product } from '@prisma/client'
+import { Product, ProductVariant } from '@prisma/client'
+import { ProductWithData } from '@/types'
 
 interface EditProductFormProps {
-  product: Product
+  product: ProductVariant
   setIsChanged: (value: boolean) => void
   setOpen: (value: boolean) => void
 }
@@ -39,8 +40,8 @@ export default function EditProductForm({
   const { toast } = useToast()
 
   const defaultValues = {
-    name: product.name,
-    description: product.description,
+    name: product.variantProductName,
+    description: product.variantDescription,
     priceInCents: product.priceInCents,
     quantity: product.inventory,
     available: product.available ? 'true' : 'false',
@@ -49,8 +50,8 @@ export default function EditProductForm({
   const form = useForm<z.infer<typeof CreateProductSchema>>({
     resolver: zodResolver(CreateProductSchema),
     defaultValues: {
-      name: product.name,
-      description: product.description,
+      name: product.variantProductName,
+      description: product.variantDescription ?? undefined,
       priceInCents: product.priceInCents,
       quantity: product.inventory,
       available: product.available ? 'true' : 'false',

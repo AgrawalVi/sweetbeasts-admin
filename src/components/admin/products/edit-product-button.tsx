@@ -1,4 +1,4 @@
-import { Product } from '@prisma/client'
+import { Product, ProductVariant } from '@prisma/client'
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,7 @@ import { useState } from 'react'
 import { Pencil } from 'lucide-react'
 
 interface EditProductButtonProps {
-  product: Product
+  product: ProductVariant
 }
 
 const EditProductButton: React.FC<EditProductButtonProps> = ({ product }) => {
