@@ -3,7 +3,7 @@
 import { db } from '@/lib/db'
 import { currentRole } from '@/lib/auth'
 import { UserRole } from '@prisma/client'
-import { getProductById } from '@/data/admin/products'
+import { getProductVariantById } from '@/data/admin/products'
 
 export const deleteProduct = async (productId: number) => {
   // THIS IS AN ADMIN ONLY ACTION
@@ -18,7 +18,7 @@ export const deleteProduct = async (productId: number) => {
 
   console.log(productId)
 
-  const existingProduct = await getProductById(productId)
+  const existingProduct = await getProductVariantById(productId)
 
   if (!existingProduct) {
     return { error: 'Product not found' }

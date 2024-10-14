@@ -1,6 +1,9 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -30,6 +33,13 @@ enum ShippingMethod {
   EXPEDITED
 }
 
+enum Courier {
+  UPS
+  USPS
+  FEDEX
+  DHL
+}
+
 enum ContactUsStatus {
   OPEN
   CLAIMED
@@ -39,12 +49,6 @@ enum ContactUsStatus {
 enum ContactUsType {
   FEEDBACK
   SUPPORT
-}
-
-enum OrderReturnStatus {
-  INITIATED
-  APPROVED
-  REJECTED
 }
 
 model User {
@@ -58,7 +62,7 @@ model User {
   role                  UserRole               @default(CUSTOMER)
   accounts              Account[]
   isTwoFactorEnabled    Boolean                @default(false)
-  twoFactorConfirmation TwoFactorConfirmation?
+  TwoFactorConfirmation TwoFactorConfirmation?
 
   newsletterSubscribed Boolean @default(false)
 
@@ -67,12 +71,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  cartItems                CartItem[]
-  ShippingAddress          ShippingAddress[]
-  Order                    Order[]
-  contactUsUserSubmissions ContactUsSubmission[] @relation("SubmittedBy")
-  contactUsUserClaims      ContactUsSubmission[] @relation("ClaimedBy")
-  LineItem                 LineItem[]
+  cartItem             CartItem[]
+  shippingAddress      ShippingAddress[]
+  order                Order[]
+  contactUsSubmissions ContactUsSubmission[] @relation("SubmittedBy")
+  contactUsUserClaims  ContactUsSubmission[] @relation("ClaimedBy")
 }
 
 model Account {
@@ -141,33 +144,65 @@ model CartItem {
   quantity  Int
   productId Int
 
-  user    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product ProductVariant? @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([userId, productId]) // user can only have 1 product active at a time
   @@unique([guestId, productId]) // guest can only have 1 product active at a time
 }
 
 model Product {
-  id               Int      @id @default(autoincrement())
-  name             String   @unique
-  priceInCents     Int
-  description      String
-  stripeProductId  String   @unique
-  stripePriceId    String   @unique
-  primaryImagePath String
-  productHref      String   @default("/products")
-  numSold          Int      @default(0)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  active   Boolean @default(false)
+  archived Boolean @default(false)
+
+  productHref         String?
+  primaryProductImage String?
+
+  description String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  variants ProductVariant[] @relation("variants")
+}
+
+model ProductVariant {
+  id Int @id @default(autoincrement())
+
+  variantProductName String  @unique
+  variantKey         String?
+  variantDescription String?
+  primaryVariant     Boolean @default(false)
 
   inventory Int
+  numSold   Int @default(0)
 
-  available Boolean @default(true)
+  available Boolean @default(false)
+  archived  Boolean @default(false)
+
+  stripeProductId String @unique
+
+  imageHref String?
+
+  parentProductId Int
+  parentProduct   Product @relation("variants", fields: [parentProductId], references: [id], onDelete: Restrict)
 
   cartItems            CartItem[]
   lineItems            LineItem[]
   openCheckoutSessions OpenCheckoutSessions[]
+
+  priceInCents  Int
+  stripePriceId String @unique
+
+  shippingIncluded Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([parentProductId, variantKey])
 }
 
 model Order {
@@ -178,13 +213,14 @@ model Order {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  orderNumber String @unique
+  orderNumber    String @unique
+  viewOrderToken String @unique
 
   stripeOrderId    String @unique
   stripeCustomerId String
 
   shippingAddressId Int
-  ShippingAddress   ShippingAddress @relation(fields: [shippingAddressId], references: [id], onDelete: Restrict)
+  shippingAddress   ShippingAddress @relation(fields: [shippingAddressId], references: [id], onDelete: Restrict)
 
   couponId String?
 
@@ -195,27 +231,14 @@ model Order {
   shippingMethod ShippingMethod @default(STANDARD)
   orderStatus    OrderStatus    @default(PROCESSING)
 
-  labelUrl        String?
-  shippoLabelId   String?
-  courier         String?
-  shippingService String?
-
   trackingNumber String?
   trackingUrl    String?
-
-  orderShippedDate DateTime?
-
-  orderCancelledDate DateTime?
-  orderDeliveredDate DateTime?
-
-  orderExceptionDate    DateTime?
-  orderExceptionMessage String?
+  courier        Courier?
 
   lineItems           LineItem[]
-  User                User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user                User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
   guestUser           GuestUser?            @relation(fields: [guestUserId], references: [id], onDelete: SetNull)
-  ViewOrderToken      ViewOrderToken[]
-  ContactUsSubmission ContactUsSubmission[]
+  contactUsSubmission ContactUsSubmission[]
 }
 
 model LineItem {
@@ -229,17 +252,8 @@ model LineItem {
   productId Int
   quantity  Int
 
-  returnQuantity         Int?
-  returnReason           String?
-  returnStatus           OrderReturnStatus?
-  returnInitiatedDate    DateTime?
-  returnApprovedDate     DateTime?
-  returnRejectedDate     DateTime?
-  returnApprovedByUserId String?
-
-  User    User?   @relation(fields: [returnApprovedByUserId], references: [id], onDelete: SetNull)
-  Order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  Product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  order          Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productVariant ProductVariant @relation(fields: [productId], references: [id], onDelete: Restrict)
 
   orderId Int
 }
@@ -261,21 +275,9 @@ model ShippingAddress {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Order                 Order[]
-  User                  User?                   @relation(fields: [userId], references: [id], onDelete: SetNull)
-  GuestUser             GuestUser?              @relation(fields: [guestUserId], references: [id])
-  ShippingFromAddresses ShippingFromAddresses[]
-}
-
-model ViewOrderToken {
-  id      String   @id @default(cuid())
-  orderId Int
-  token   String   @unique
-  expires DateTime
-
-  Order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
-  @@unique([orderId, token])
+  order     Order[]
+  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guestUser GuestUser? @relation(fields: [guestUserId], references: [id])
 }
 
 model OpenCheckoutSessions {
@@ -284,7 +286,7 @@ model OpenCheckoutSessions {
   createdAt               DateTime @default(now())
   stripeCheckoutSessionId String   @unique
 
-  products Product[]
+  products ProductVariant[]
 }
 
 model GuestUser {
@@ -298,7 +300,7 @@ model GuestUser {
 
   shippingAddresses   ShippingAddress[]
   orders              Order[]
-  ContactUsSubmission ContactUsSubmission[]
+  contactUsSubmission ContactUsSubmission[]
 }
 
 model ContactUsSubmission {
@@ -328,28 +330,4 @@ model ContactUsSubmission {
   contactUsType ContactUsType
 
   message String[]
-}
-
-model ShippingFromAddresses {
-  id Int @id @default(autoincrement())
-
-  name String @unique
-
-  shippingAddressId Int
-  shippingAddress   ShippingAddress @relation(fields: [shippingAddressId], references: [id], onDelete: Restrict)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Boxes {
-  id Int @id @default(autoincrement())
-
-  // in inches
-  heightInInches Int
-  widthInInches  Int
-  depthInInches  Int
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }

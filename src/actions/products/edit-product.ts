@@ -4,9 +4,9 @@ import * as z from 'zod'
 import { stripe } from '@/lib/stripe'
 import { db } from '@/lib/db'
 import { CreateProductSchema } from '@/schemas'
-import { getProductById } from '@/data/admin/products'
 import { currentRole } from '@/lib/auth'
 import { UserRole } from '@prisma/client'
+import { getProductVariantById } from '@/data/admin/products'
 
 export const editProduct = async (
   values: z.infer<typeof CreateProductSchema>,
@@ -32,7 +32,7 @@ export const editProduct = async (
     validatedFields.data
 
   // verify that the product exists
-  const existingProduct = await getProductById(productId)
+  const existingProduct = await getProductVariantById(productId)
 
   if (!existingProduct) {
     return { error: 'Product not found' }
@@ -67,15 +67,15 @@ export const editProduct = async (
 
   // update the product information in our database
   try {
-    await db.product.update({
+    await db.productVariant.update({
       where: {
         id: productId,
       },
       data: {
-        name,
+        variantProductName: name,
         inventory: quantity,
-        priceInCents,
-        description,
+        priceInCents: priceInCents,
+        variantDescription: description,
         available: available === 'true' ? true : false,
       },
     })

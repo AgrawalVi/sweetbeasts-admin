@@ -82,6 +82,40 @@ export const NewPasswordSchema = z
 
 // ADMIN PORTAL SCHEMAS
 
+export const RootProductSchema = z.object({
+  name: z.string().min(1, {
+    message: 'Name is required',
+  }),
+  description: z.string().min(1, {
+    message: 'Description is required',
+  }),
+})
+
+export const ProductVariantSchema = z.object({
+  variantProductName: z
+    .string()
+    .min(1, { message: 'Please name the product variant' }),
+  variantKey: z
+    .string()
+    .min(1, { message: 'Add a key for the product variant' }),
+  description: z
+    .string()
+    .min(1, { message: 'Add a description for the product variant' }),
+  priceInCents: z.coerce
+    .number({
+      message: 'Price must be a number',
+    })
+    .gte(99, {
+      message: 'Price has to be greater than $0.99',
+    }),
+  quantity: z.coerce.number({
+    message: 'Quantity must be a number',
+  }),
+  available: z.enum(['true', 'false'], {
+    message: 'Available must be a boolean',
+  }),
+})
+
 export const CreateProductSchema = z.object({
   name: z.string().min(1, {
     message: 'Name is required',
