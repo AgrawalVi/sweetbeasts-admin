@@ -38,20 +38,26 @@ export const editProduct = async (
     return { error: 'Product not found' }
   }
 
+  let price
+  let price_changed = false
+
   // update the price and product information in stripe if necessary
   // if the price is different, update the price in stripe
   if (existingProduct.priceInCents !== priceInCents) {
     try {
-      await stripe.prices.update(existingProduct.stripePriceId, {
-        currency_options: {
-          usd: {
-            unit_amount: priceInCents,
-          },
-        },
+      let temp = await stripe.prices.create({
+        unit_amount: priceInCents,
+        currency: 'usd',
+        product: existingProduct.stripeProductId,
       })
-    } catch {
+      price = temp.id
+      price_changed = true
+    } catch (e) {
+      console.log(e)
       return { error: 'Failed to update price in stripe' }
     }
+  } else {
+    price = existingProduct.stripePriceId
   }
 
   // update the product information in stripe if necessary
@@ -60,8 +66,21 @@ export const editProduct = async (
       name,
       description,
       active: available === 'true' ? true : false,
+      default_price: price,
     })
-  } catch {
+  } catch (e) {
+    console.log(e)
+    return { error: 'Failed to update product in stripe' }
+  }
+
+  try {
+    if (price_changed) {
+      await stripe.prices.update(existingProduct.stripePriceId, {
+        active: false,
+      })
+    }
+  } catch (e) {
+    console.log(e)
     return { error: 'Failed to update product in stripe' }
   }
 
@@ -77,6 +96,7 @@ export const editProduct = async (
         priceInCents: priceInCents,
         variantDescription: description,
         available: available === 'true' ? true : false,
+        stripePriceId: price,
       },
     })
   } catch {
