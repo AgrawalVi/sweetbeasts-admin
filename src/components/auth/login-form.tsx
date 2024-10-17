@@ -84,10 +84,8 @@ export const LoginForm = ({}) => {
       headerLabel={
         showTwoFactor ? 'Two Factor Authentication' : 'Please login below'
       }
-      backButtonLabel={
-        showTwoFactor ? 'Create an account' : "Don't have an account?"
-      }
-      backButtonHref="/auth/register"
+      backButtonLabel="Go Home"
+      backButtonHref="/"
       showSocial={!showTwoFactor}
       googleButtonText="Continue with Google"
     >
@@ -166,7 +164,7 @@ export const LoginForm = ({}) => {
                   <Button
                     variant="link"
                     size="sm"
-                    className="px-0 text-xs font-normal text-black"
+                    className="px-0 text-xs font-normal text-muted-foreground"
                     asChild
                   >
                     <Link href="/auth/reset-password">

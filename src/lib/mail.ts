@@ -2,9 +2,10 @@ import { Resend } from 'resend'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const fromEmail = 'account@sweetbeasts.shop'
+const baseURL = process.env.NEXT_PUBLIC_BASE_URL!
 
 export const sendVerificationEmail = async (email: string, token: string) => {
-  const confirmLink = `http://localhost:3000/auth/verify-email?token=${token}`
+  const confirmLink = `${baseURL}/auth/verify-email?token=${token}`
 
   await resend.emails.send({
     from: fromEmail,
@@ -15,7 +16,7 @@ export const sendVerificationEmail = async (email: string, token: string) => {
 }
 
 export const sendResetPasswordEmail = async (email: string, token: string) => {
-  const resetLink = `http://localhost:3000/auth/new-password?token=${token}`
+  const resetLink = `${baseURL}/auth/new-password?token=${token}`
 
   await resend.emails.send({
     from: fromEmail,
