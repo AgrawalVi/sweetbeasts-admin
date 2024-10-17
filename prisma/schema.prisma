@@ -63,8 +63,6 @@ model User {
   isTwoFactorEnabled    Boolean                @default(false)
   TwoFactorConfirmation TwoFactorConfirmation?
 
-  newsletterSubscribed Boolean @default(false)
-
   stripeCustomerId String @unique
 
   createdAt DateTime @default(now())
@@ -75,6 +73,7 @@ model User {
   order                Order[]
   contactUsSubmissions ContactUsSubmission[] @relation("SubmittedBy")
   contactUsUserClaims  ContactUsSubmission[] @relation("ClaimedBy")
+  MailingList          MailingList?
 }
 
 model Account {
@@ -367,4 +366,20 @@ model Boxes {
   depthInInches  Int
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+}
+
+model MailingList {
+  id Int @id @default(autoincrement())
+
+  email      String  @unique
+  userId     String? @unique
+  resendId   String  @unique
+  subscribed Boolean @default(true)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([resendId])
 }
