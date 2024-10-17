@@ -39,7 +39,6 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
       email,
       password: hashedPassword,
       stripeCustomerId: stripeCustomer.id,
-      newsletterSubscribed: true,
     },
   })
 
